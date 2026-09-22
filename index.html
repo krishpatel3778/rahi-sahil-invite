@@ -68,6 +68,21 @@
   /* nothing is given away before the ring is tapped */
   [data-state="opening"] video { opacity: 0; }
 
+  /* FULLSCREEN: never crop.
+     `cover` fills the frame, which is right for the 9:16 card but ruinous in
+     fullscreen — a 9:16 video in a 16:9 screen gets scaled until it covers the
+     width, so most of the picture ends up above and below the viewport. On a
+     phone it clips the sides; on a desktop you see a narrow horizontal slice.
+     In fullscreen we letterbox instead, so the whole frame is visible.
+     Each selector gets its OWN rule on purpose: in CSS, one unrecognised
+     selector in a comma-separated list invalidates the whole rule, and no
+     engine knows every vendor's fullscreen pseudo-class. Grouped, they all
+     die together. */
+  video.fs               { object-fit: contain; background: #000; }
+  video:fullscreen       { object-fit: contain; background: #000; }
+  video:-webkit-full-screen { object-fit: contain; background: #000; }
+  video:-moz-full-screen    { object-fit: contain; background: #000; }
+
   .tap {
     position: absolute; inset: 0; z-index: 2;
     display: grid; place-items: center;
@@ -415,8 +430,21 @@
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); launch(); }
   });
 
+  /* The :fullscreen pseudo-class isn't reliable across every engine/version,
+     so mirror the state onto a class as well. */
+  function syncFs() {
+    var el = document.fullscreenElement || document.webkitFullscreenElement || null;
+    if (el === v) { v.classList.add("fs"); } else { v.classList.remove("fs"); }
+  }
+  document.addEventListener("fullscreenchange", syncFs);
+  document.addEventListener("webkitfullscreenchange", syncFs);
+  // iOS Safari's native video fullscreen fires its own pair
+  v.addEventListener("webkitbeginfullscreen", function () { v.classList.add("fs"); });
+  v.addEventListener("webkitendfullscreen", function () { v.classList.remove("fs"); });
+
   v.addEventListener("ended", function () {
     exitFullscreen();
+    v.classList.remove("fs");
     setTimeout(function () { set("done"); }, 280);
   });
 
