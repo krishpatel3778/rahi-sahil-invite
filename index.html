@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rahi &amp; Sahil — Ring Ceremony</title>
 <meta name="description" content="Ring ceremony invitation — Wednesday, 16 December 2026.">
-<meta name="theme-color" content="#120D0C">
+<meta name="theme-color" content="#0E0A09">
 
 <meta property="og:title" content="Rahi &amp; Sahil — Ring Ceremony">
 <meta property="og:description" content="Wednesday, 16 December 2026 · Prakruti Party Plot">
@@ -17,170 +17,314 @@
 
 <style>
   :root {
-    --ink:    #F4EBDD;
-    --dim:    #B09C89;
-    --gold:   #D4A94A;
-    --maroon: #6B1F2E;
-    --bg:     #120D0C;
-    --panel:  #1A1312;
+    --ink:   #F4EBDD;
+    --dim:   #AE9986;
+    --gold:  #D4A94A;
+    --maroon:#6B1F2E;
+    --bg:    #0E0A09;
+    --panel: #191211;
+    /* long, decelerating ease — the thing that makes motion read as expensive */
+    --ease:  cubic-bezier(0.16, 1, 0.3, 1);
   }
   * { box-sizing: border-box; }
-  html { background: var(--bg); }
+  html, body { height: 100%; margin: 0; background: var(--bg); }
   body {
-    margin: 0;
-    background: var(--bg);
     color: var(--ink);
     font-family: "Karla", system-ui, -apple-system, sans-serif;
     font-size: 15px; line-height: 1.6;
-    padding: max(26px, env(safe-area-inset-top)) 18px max(34px, env(safe-area-inset-bottom));
     -webkit-font-smoothing: antialiased;
+    overflow: hidden;
   }
 
-  .card {
-    width: 100%; max-width: 420px; margin: 0 auto;
-    display: flex; flex-direction: column; gap: 22px;
+  .scene {
+    position: relative; width: 100%;
+    height: 100vh; height: 100dvh;
+    margin-inline: auto; overflow: hidden;
+    background: radial-gradient(130% 90% at 50% 8%, #1A1210 0%, var(--bg) 58%);
+  }
+  @media (min-aspect-ratio: 3/4) {
+    body { background: #070505; }
+    .scene { max-width: calc(100dvh * 9 / 16); box-shadow: 0 0 100px rgba(0,0,0,0.8); }
   }
 
-  /* ---- header ---- */
-  header { text-align: center; }
-  .k {
-    font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+  /* ================= video ================= */
+  .player {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    transition: transform 1100ms var(--ease), filter 1000ms var(--ease), opacity 1000ms var(--ease);
+  }
+  video {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block; background: #000;
+  }
+  /* when it's over, the video recedes into a texture behind the words */
+  [data-state="done"] .player {
+    transform: scale(1.07);
+    filter: blur(16px) saturate(0.7);
+    opacity: 0.2;
+  }
+
+  /* ================= idle card ================= */
+  .idle {
+    position: absolute; inset: 0; z-index: 3;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 34px;
+    padding: 0 24px;
+    background: radial-gradient(120% 80% at 50% 88%, rgba(212,169,74,0.16), transparent 62%),
+                linear-gradient(175deg, #1C1412 0%, #0E0A09 60%, #080605 100%);
+    transition: opacity 700ms var(--ease), transform 900ms var(--ease);
+  }
+  [data-state="playing"] .idle,
+  [data-state="done"] .idle {
+    opacity: 0; transform: scale(1.04); pointer-events: none;
+  }
+
+  .eyebrow {
+    font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin: 0; opacity: 0.9;
+  }
+  .names {
+    font-family: "Marcellus", Georgia, serif; font-weight: 400;
+    font-size: clamp(34px, 10vw, 50px); line-height: 1.12;
+    margin: 14px 0 0; text-align: center; letter-spacing: 0.015em;
+  }
+  .names .amp { display: block; color: var(--gold); font-size: 0.55em; margin: 3px 0; }
+
+  /* play control — thin gold ring, breathing */
+  .play {
+    width: 72px; height: 72px; border-radius: 50%;
+    border: 1px solid rgba(212,169,74,0.55);
+    background: rgba(255,255,255,0.02);
+    display: grid; place-items: center; cursor: pointer;
+    position: relative; padding: 0;
+    transition: transform 500ms var(--ease), background 400ms ease, border-color 400ms ease;
+  }
+  .play::before {
+    content: ""; position: absolute; inset: -1px; border-radius: 50%;
+    border: 1px solid rgba(212,169,74,0.5);
+    animation: ripple 3s var(--ease) infinite;
+  }
+  @keyframes ripple {
+    0%   { transform: scale(1);    opacity: 0.6; }
+    70%  { transform: scale(1.45); opacity: 0; }
+    100% { transform: scale(1.45); opacity: 0; }
+  }
+  .play:hover { transform: scale(1.06); background: rgba(212,169,74,0.09); }
+  .play:active { transform: scale(0.97); }
+  .play svg { width: 19px; height: 19px; fill: var(--gold); margin-left: 3px; }
+  .play-hint {
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--dim); margin: 0;
+  }
+
+  /* ================= the reveal ================= */
+  .reveal {
+    position: absolute; inset: 0; z-index: 4;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 0 26px; text-align: center;
+    pointer-events: none;
+  }
+  [data-state="done"] .reveal { pointer-events: auto; }
+
+  /* every revealed element shares this; direction and delay are per-element */
+  .r {
+    opacity: 0;
+    transform: translateY(var(--y, 30px));
+    filter: blur(7px);
+    transition:
+      opacity   780ms var(--ease) var(--d, 0ms),
+      transform 980ms var(--ease) var(--d, 0ms),
+      filter    780ms var(--ease) var(--d, 0ms),
+      letter-spacing 1200ms var(--ease) var(--d, 0ms);
+  }
+  [data-state="done"] .r { opacity: 1; transform: none; filter: none; }
+
+  /* names descend from above, and their tracking settles as they land */
+  .rv-eyebrow { --y: -26px; --d: 220ms;
+    font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
     color: var(--gold); margin: 0 0 12px;
   }
-  h1 {
-    font-family: "Marcellus", Georgia, serif; font-weight: 400;
-    font-size: clamp(30px, 8.5vw, 40px); line-height: 1.16;
-    margin: 0; letter-spacing: 0.01em;
+  .rv-names { --y: -46px; --d: 120ms;
+    font-family: "Marcellus", Georgia, serif;
+    font-size: clamp(30px, 8.5vw, 42px); line-height: 1.14;
+    margin: 0 0 22px; letter-spacing: 0.16em;
   }
-  h1 .amp { display: block; color: var(--gold); font-size: 0.58em; margin: 1px 0; }
+  [data-state="done"] .rv-names { letter-spacing: 0.015em; }
+  .rv-names .amp { display: block; color: var(--gold); font-size: 0.56em; margin: 2px 0; }
 
-  /* ---- video ---- */
-  .player {
-    width: 100%; aspect-ratio: 9 / 16;
-    max-height: 68vh;
-    max-width: calc(68vh * 9 / 16);
-    margin-inline: auto;
-    background: #000;
-    border: 1px solid rgba(212,169,74,0.24);
-    border-radius: 4px; overflow: hidden;
+  /* the hairline draws itself across the meeting point */
+  .rv-rule {
+    width: 54px; height: 1px; background: var(--gold); opacity: 0.65;
+    margin: 0 0 22px; transform: scaleX(0); transform-origin: 50% 50%;
+    transition: transform 900ms var(--ease) 430ms, opacity 500ms ease 430ms;
+    filter: none;
   }
-  video { width: 100%; height: 100%; display: block; background: #000; }
-  /* in fullscreen the browser owns the box — let it fill properly */
-  video:fullscreen, video:-webkit-full-screen { object-fit: contain; background: #000; }
+  [data-state="done"] .rv-rule { transform: scaleX(1); }
 
-  /* ---- details ---- */
-  .details { text-align: center; }
-  .occ {
-    font-family: "Marcellus", Georgia, serif; font-size: 20px;
-    margin: 0 0 13px; letter-spacing: 0.02em;
+  /* everything below rises */
+  .rv-occ  { --y: 30px; --d: 540ms;
+    font-family: "Marcellus", Georgia, serif; font-size: 19px;
+    margin: 0 0 10px; letter-spacing: 0.02em;
   }
-  .hr { width: 36px; height: 1px; background: var(--gold); opacity: 0.6; margin: 0 auto 13px; }
-  .when { font-size: 16px; margin: 0 0 14px; }
-
-  .sched {
+  .rv-when { --y: 30px; --d: 620ms; font-size: 16px; margin: 0 0 14px; }
+  .rv-sched { --y: 30px; --d: 700ms;
     display: inline-grid; grid-template-columns: auto auto;
-    gap: 4px 16px; text-align: left; margin: 0 0 16px;
+    gap: 4px 18px; text-align: left; margin: 0 0 18px;
   }
-  .sched dt { font-size: 14.5px; color: var(--dim); margin: 0; }
-  .sched dd {
-    margin: 0; font-size: 15.5px; text-align: right;
-    font-variant-numeric: tabular-nums;
+  .rv-sched dt { font-size: 14.5px; color: var(--dim); margin: 0; }
+  .rv-sched dd { margin: 0; font-size: 15.5px; text-align: right; font-variant-numeric: tabular-nums; }
+  .rv-where { --y: 30px; --d: 780ms;
+    font-family: "Marcellus", Georgia, serif; font-size: 17px; margin: 0 0 2px;
   }
+  .rv-road { --y: 30px; --d: 820ms; font-size: 13.5px; color: var(--dim); margin: 0 0 26px; }
 
-  .where { font-family: "Marcellus", Georgia, serif; font-size: 17px; margin: 0 0 2px; }
-  .road { font-size: 13.5px; color: var(--dim); margin: 0; }
-
-  .actions { display: flex; gap: 10px; }
-  .actions a {
+  .rv-actions { --y: 30px; --d: 900ms;
+    display: flex; gap: 10px; width: 100%; max-width: 340px; margin: 0 0 20px;
+  }
+  .rv-actions a {
     flex: 1; text-align: center; text-decoration: none;
     font-size: 13.5px; letter-spacing: 0.02em; padding: 12px 8px;
     border-radius: 3px; color: var(--gold);
-    border: 1px solid rgba(212,169,74,0.4); background: var(--panel);
+    border: 1px solid rgba(212,169,74,0.4);
+    background: rgba(25,18,17,0.72);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    transition: background 300ms ease, border-color 300ms ease, color 300ms ease;
   }
-  .actions a:active { background: var(--maroon); border-color: var(--maroon); color: var(--ink); }
+  .rv-actions a:hover { background: rgba(212,169,74,0.12); border-color: var(--gold); }
+  .rv-actions a:active { background: var(--maroon); border-color: var(--maroon); color: var(--ink); }
 
-  .foot {
-    text-align: center; font-family: "Marcellus", Georgia, serif;
-    font-size: 14px; color: var(--dim); margin: 0;
+  .replay { --y: 22px; --d: 1000ms;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: none; border: 0; cursor: pointer; padding: 6px 4px;
+    font-family: "Karla", sans-serif; font-size: 11px;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);
+    transition: color 300ms ease,
+      opacity 780ms var(--ease) var(--d), transform 980ms var(--ease) var(--d),
+      filter 780ms var(--ease) var(--d);
+  }
+  .replay:hover { color: var(--gold); }
+  .replay svg { width: 13px; height: 13px; fill: currentColor; }
+
+  @media (max-height: 640px) {
+    .rv-names { font-size: clamp(26px, 7vh, 34px); margin-bottom: 16px; }
+    .rv-rule { margin-bottom: 16px; }
+    .rv-road { margin-bottom: 18px; }
+    .rv-sched { margin-bottom: 14px; }
   }
 
-  @media (max-width: 340px) { .actions { flex-direction: column; } }
+  @media (prefers-reduced-motion: reduce) {
+    .r, .rv-rule, .player, .idle, .replay { transition-duration: 1ms !important; }
+    .play::before { animation: none; }
+    [data-state="done"] .player { filter: none; }
+  }
 </style>
 </head>
 <body>
 
-<div class="card">
-
-  <header>
-    <p class="k">Together with their families</p>
-    <h1>Rahi<span class="amp">&amp;</span>Sahil</h1>
-  </header>
+<div class="scene" id="scene" data-state="idle">
 
   <!-- EDIT: drop your file in as invite.mp4 -->
   <div class="player">
-    <video id="v" controls playsinline preload="metadata" disablepictureinpicture>
+    <video id="v" playsinline preload="metadata" disablepictureinpicture>
       <source src="invite.mp4" type="video/mp4">
-      Your browser can't play this video — the details are below.
     </video>
   </div>
 
-  <div class="details">
-    <p class="occ">Ring Ceremony</p>
-    <div class="hr"></div>
-    <p class="when">Wednesday, 16 December 2026</p>
+  <div class="idle" id="idle">
+    <div>
+      <p class="eyebrow">Together with their families</p>
+      <p class="names">Rahi<span class="amp">&amp;</span>Sahil</p>
+    </div>
+    <button class="play" id="play" type="button" aria-label="Play the invitation">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <p class="play-hint">Play invitation</p>
+  </div>
 
-    <dl class="sched">
+  <div class="reveal">
+    <p class="r rv-eyebrow">Together with their families</p>
+    <p class="r rv-names">Rahi<span class="amp">&amp;</span>Sahil</p>
+    <div class="rv-rule"></div>
+
+    <p class="r rv-occ">Ring Ceremony</p>
+    <p class="r rv-when">Wednesday, 16 December 2026</p>
+    <dl class="r rv-sched">
       <dt>Ceremony</dt><dd>6:00 pm</dd>
       <dt>Dinner</dt><dd>7:30 pm</dd>
     </dl>
+    <p class="r rv-where">Prakruti Party Plot</p>
+    <p class="r rv-road">Hadiyol Road</p>
 
-    <p class="where">Prakruti Party Plot</p>
-    <p class="road">Hadiyol Road</p>
+    <div class="r rv-actions">
+      <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Rahi%20%26%20Sahil%20%E2%80%94%20Ring%20Ceremony&amp;dates=20261216T180000/20261216T220000&amp;ctz=Asia/Kolkata&amp;location=Prakruti%20Party%20Plot%2C%20Hadiyol%20Road&amp;details=Ceremony%206%3A00%20pm%20%C2%B7%20Dinner%207%3A30%20pm" target="_blank" rel="noopener">Add to calendar</a>
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=Prakruti%20Party%20Plot%20Hadiyol%20Road" target="_blank" rel="noopener">Open in Maps</a>
+    </div>
+
+    <button class="r replay" id="replay" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg>
+      Play again
+    </button>
   </div>
-
-  <div class="actions">
-    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Rahi%20%26%20Sahil%20%E2%80%94%20Ring%20Ceremony&amp;dates=20261216T180000/20261216T220000&amp;ctz=Asia/Kolkata&amp;location=Prakruti%20Party%20Plot%2C%20Hadiyol%20Road&amp;details=Ceremony%206%3A00%20pm%20%C2%B7%20Dinner%207%3A30%20pm" target="_blank" rel="noopener">Add to calendar</a>
-    <a href="https://www.google.com/maps/search/?api=1&amp;query=Prakruti%20Party%20Plot%20Hadiyol%20Road" target="_blank" rel="noopener">Open in Maps</a>
-  </div>
-
-  <p class="foot">We would be glad to have you there</p>
 
 </div>
 
 <script>
 (function () {
-  var v = document.getElementById("v");
-  if (!v) return;
+  var scene  = document.getElementById("scene");
+  var v      = document.getElementById("v");
+  var play   = document.getElementById("play");
+  var replay = document.getElementById("replay");
+  var wentFs = false;
 
-  // Go fullscreen when playback starts. Every one of these can be refused —
-  // the promise rejection is swallowed so the video just keeps playing inline
-  // rather than throwing.
-  function full() {
+  function set(s) { scene.dataset.state = s; }
+
+  function fullscreen() {
     try {
-      if (v.requestFullscreen) {
-        var r = v.requestFullscreen();
-        if (r && r.catch) r.catch(function () {});
-      } else if (v.webkitEnterFullscreen) {
-        v.webkitEnterFullscreen();          // iPhone Safari's own video fullscreen
-      } else if (v.webkitRequestFullscreen) {
-        v.webkitRequestFullscreen();        // older WebKit / Android
-      }
+      if (v.requestFullscreen) { var r = v.requestFullscreen(); if (r && r.catch) r.catch(function(){}); }
+      else if (v.webkitEnterFullscreen) { v.webkitEnterFullscreen(); }
+      else if (v.webkitRequestFullscreen) { v.webkitRequestFullscreen(); }
     } catch (e) {}
   }
-
-  v.addEventListener("play", function () {
-    // Only on the first play, so scrubbing or pausing mid-watch doesn't
-    // yank the viewer back into fullscreen.
-    if (!v.dataset.went) { v.dataset.went = "1"; full(); }
-  });
-
-  // Leave fullscreen when it finishes.
-  v.addEventListener("ended", function () {
+  function exitFullscreen() {
     try {
       if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen();
       else if (document.webkitExitFullscreen && document.webkitFullscreenElement) document.webkitExitFullscreen();
     } catch (e) {}
+  }
+
+  function start() {
+    set("playing");
+    v.currentTime = 0;
+    v.muted = false;            // a real tap started this, so audio is allowed
+    var p = v.play();
+    if (p && p.catch) p.catch(function () { set("done"); });   // can't play? show the details
+    if (!wentFs) { wentFs = true; fullscreen(); }
+  }
+
+  play.addEventListener("click", start);
+
+  replay.addEventListener("click", function () {
+    set("playing");
+    v.currentTime = 0;
+    var p = v.play();
+    if (p && p.catch) p.catch(function () { set("done"); });
+    fullscreen();
   });
+
+  v.addEventListener("ended", function () {
+    exitFullscreen();
+    // let the browser finish its own exit-fullscreen animation first, so the
+    // two transitions don't fight each other
+    setTimeout(function () { set("done"); }, 260);
+  });
+
+  // If the video is missing or won't decode, go straight to the details —
+  // the page is an invitation first and a video second.
+  function noVideo() { set("done"); }
+  v.addEventListener("error", noVideo);
+  var src = v.querySelector("source");
+  if (src) src.addEventListener("error", noVideo);
 })();
 </script>
 
