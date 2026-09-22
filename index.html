@@ -54,11 +54,9 @@
   }
   h1 .amp { display: block; color: var(--gold); font-size: 0.58em; margin: 1px 0; }
 
-  /* ---- video: its own block, nothing sits on top of it ---- */
+  /* ---- video ---- */
   .player {
     width: 100%; aspect-ratio: 9 / 16;
-    /* both caps, so the box shrinks proportionally instead of going wide
-       and letterboxing the video with black bars */
     max-height: 68vh;
     max-width: calc(68vh * 9 / 16);
     margin-inline: auto;
@@ -67,16 +65,28 @@
     border-radius: 4px; overflow: hidden;
   }
   video { width: 100%; height: 100%; display: block; background: #000; }
+  /* in fullscreen the browser owns the box — let it fill properly */
+  video:fullscreen, video:-webkit-full-screen { object-fit: contain; background: #000; }
 
-  /* ---- details, in normal flow underneath ---- */
+  /* ---- details ---- */
   .details { text-align: center; }
   .occ {
     font-family: "Marcellus", Georgia, serif; font-size: 20px;
     margin: 0 0 13px; letter-spacing: 0.02em;
   }
   .hr { width: 36px; height: 1px; background: var(--gold); opacity: 0.6; margin: 0 auto 13px; }
-  .when { font-size: 16px; margin: 0 0 2px; }
-  .time { font-size: 15px; color: var(--dim); margin: 0 0 13px; }
+  .when { font-size: 16px; margin: 0 0 14px; }
+
+  .sched {
+    display: inline-grid; grid-template-columns: auto auto;
+    gap: 4px 16px; text-align: left; margin: 0 0 16px;
+  }
+  .sched dt { font-size: 14.5px; color: var(--dim); margin: 0; }
+  .sched dd {
+    margin: 0; font-size: 15.5px; text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
   .where { font-family: "Marcellus", Georgia, serif; font-size: 17px; margin: 0 0 2px; }
   .road { font-size: 13.5px; color: var(--dim); margin: 0; }
 
@@ -108,7 +118,7 @@
 
   <!-- EDIT: drop your file in as invite.mp4 -->
   <div class="player">
-    <video controls playsinline preload="metadata" disablepictureinpicture>
+    <video id="v" controls playsinline preload="metadata" disablepictureinpicture>
       <source src="invite.mp4" type="video/mp4">
       Your browser can't play this video — the details are below.
     </video>
@@ -118,19 +128,61 @@
     <p class="occ">Ring Ceremony</p>
     <div class="hr"></div>
     <p class="when">Wednesday, 16 December 2026</p>
-    <p class="time">6:00 pm onwards</p>
+
+    <dl class="sched">
+      <dt>Ceremony</dt><dd>6:00 pm</dd>
+      <dt>Dinner</dt><dd>7:30 pm</dd>
+    </dl>
+
     <p class="where">Prakruti Party Plot</p>
-    <p class="road">Haidyol Road</p>
+    <p class="road">Hadiyol Road</p>
   </div>
 
   <div class="actions">
-    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Rahi%20%26%20Sahil%20%E2%80%94%20Ring%20Ceremony&amp;dates=20261216T180000/20261216T210000&amp;ctz=Asia/Kolkata&amp;location=Prakruti%20Party%20Plot%2C%20Haidyol%20Road" target="_blank" rel="noopener">Add to calendar</a>
-    <a href="https://www.google.com/maps/search/?api=1&amp;query=Prakruti%20Party%20Plot%20Haidyol%20Road" target="_blank" rel="noopener">Open in Maps</a>
+    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Rahi%20%26%20Sahil%20%E2%80%94%20Ring%20Ceremony&amp;dates=20261216T180000/20261216T220000&amp;ctz=Asia/Kolkata&amp;location=Prakruti%20Party%20Plot%2C%20Hadiyol%20Road&amp;details=Ceremony%206%3A00%20pm%20%C2%B7%20Dinner%207%3A30%20pm" target="_blank" rel="noopener">Add to calendar</a>
+    <a href="https://www.google.com/maps/search/?api=1&amp;query=Prakruti%20Party%20Plot%20Hadiyol%20Road" target="_blank" rel="noopener">Open in Maps</a>
   </div>
 
   <p class="foot">We would be glad to have you there</p>
 
 </div>
+
+<script>
+(function () {
+  var v = document.getElementById("v");
+  if (!v) return;
+
+  // Go fullscreen when playback starts. Every one of these can be refused —
+  // the promise rejection is swallowed so the video just keeps playing inline
+  // rather than throwing.
+  function full() {
+    try {
+      if (v.requestFullscreen) {
+        var r = v.requestFullscreen();
+        if (r && r.catch) r.catch(function () {});
+      } else if (v.webkitEnterFullscreen) {
+        v.webkitEnterFullscreen();          // iPhone Safari's own video fullscreen
+      } else if (v.webkitRequestFullscreen) {
+        v.webkitRequestFullscreen();        // older WebKit / Android
+      }
+    } catch (e) {}
+  }
+
+  v.addEventListener("play", function () {
+    // Only on the first play, so scrubbing or pausing mid-watch doesn't
+    // yank the viewer back into fullscreen.
+    if (!v.dataset.went) { v.dataset.went = "1"; full(); }
+  });
+
+  // Leave fullscreen when it finishes.
+  v.addEventListener("ended", function () {
+    try {
+      if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen();
+      else if (document.webkitExitFullscreen && document.webkitFullscreenElement) document.webkitExitFullscreen();
+    } catch (e) {}
+  });
+})();
+</script>
 
 </body>
 </html>
