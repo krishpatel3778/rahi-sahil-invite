@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rahi &amp; Sahil — Ring Ceremony</title>
 <meta name="description" content="Ring ceremony invitation — Wednesday, 16 December 2026.">
-<meta name="theme-color" content="#0E0A09">
+<meta name="theme-color" content="#000000">
 
 <meta property="og:title" content="Rahi &amp; Sahil — Ring Ceremony">
 <meta property="og:description" content="Wednesday, 16 December 2026 · Prakruti Party Plot">
@@ -20,251 +20,307 @@
     --ink:   #F4EBDD;
     --dim:   #AE9986;
     --gold:  #D4A94A;
+    --glow:  #FFE6A8;
     --maroon:#6B1F2E;
-    --bg:    #0E0A09;
-    --panel: #191211;
-    /* long, decelerating ease — the thing that makes motion read as expensive */
+    --bg:    #0B0807;
     --ease:  cubic-bezier(0.16, 1, 0.3, 1);
   }
   * { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; background: var(--bg); }
+  html, body { height: 100%; margin: 0; background: #000; }
   body {
     color: var(--ink);
     font-family: "Karla", system-ui, -apple-system, sans-serif;
     font-size: 15px; line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    overflow: hidden;
+    -webkit-font-smoothing: antialiased; overflow: hidden;
   }
 
   .scene {
     position: relative; width: 100%;
     height: 100vh; height: 100dvh;
-    margin-inline: auto; overflow: hidden;
-    background: radial-gradient(130% 90% at 50% 8%, #1A1210 0%, var(--bg) 58%);
+    margin-inline: auto; overflow: hidden; background: #000;
+    transition: background 900ms var(--ease);
   }
   @media (min-aspect-ratio: 3/4) {
-    body { background: #070505; }
-    .scene { max-width: calc(100dvh * 9 / 16); box-shadow: 0 0 100px rgba(0,0,0,0.8); }
+    .scene { max-width: calc(100dvh * 9 / 16); box-shadow: 0 0 110px rgba(0,0,0,0.9); }
   }
+  .scene[data-state="done"] { background: var(--bg); }
 
   /* ================= video ================= */
   .player {
-    position: absolute; inset: 0;
-    display: grid; place-items: center;
-    transition: transform 1100ms var(--ease), filter 1000ms var(--ease), opacity 1000ms var(--ease);
+    position: absolute; left: 50%; top: 0;
+    width: 100%; height: 100%;
+    transform: translateX(-50%);
+    overflow: hidden; background: #000; border-radius: 0;
+    transition:
+      width 1100ms var(--ease), height 1100ms var(--ease),
+      top 1100ms var(--ease), transform 1100ms var(--ease),
+      border-radius 900ms var(--ease), box-shadow 900ms var(--ease);
   }
-  video {
-    width: 100%; height: 100%; object-fit: cover;
-    display: block; background: #000;
-  }
-  /* when it's over, the video recedes into a texture behind the words */
   [data-state="done"] .player {
-    transform: scale(1.07);
-    filter: blur(16px) saturate(0.7);
-    opacity: 0.2;
+    top: var(--vid-top, 50%);
+    height: var(--vid-h, 34dvh);
+    width: calc(var(--vid-h, 34dvh) * 9 / 16);
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+    box-shadow: 0 20px 56px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,169,74,0.3);
   }
+  video { width: 100%; height: 100%; object-fit: cover; display: block; background: #000; }
+  /* nothing is given away before the ring is tapped */
+  [data-state="opening"] video { opacity: 0; }
 
-  /* ================= idle card ================= */
-  .idle {
-    position: absolute; inset: 0; z-index: 3;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 34px;
-    padding: 0 24px;
-    background: radial-gradient(120% 80% at 50% 88%, rgba(212,169,74,0.16), transparent 62%),
-                linear-gradient(175deg, #1C1412 0%, #0E0A09 60%, #080605 100%);
-    transition: opacity 700ms var(--ease), transform 900ms var(--ease);
+  .tap {
+    position: absolute; inset: 0; z-index: 2;
+    display: grid; place-items: center;
+    background: rgba(8,5,4,0.34);
+    opacity: 0; pointer-events: none;
+    transition: opacity 600ms var(--ease) 950ms, background 300ms ease;
   }
-  [data-state="playing"] .idle,
-  [data-state="done"] .idle {
-    opacity: 0; transform: scale(1.04); pointer-events: none;
+  [data-state="done"] .tap { opacity: 1; pointer-events: auto; }
+  .tap:hover { background: rgba(8,5,4,0.14); }
+  .ring2 {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 1px solid rgba(244,235,221,0.85);
+    display: grid; place-items: center;
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    transition: transform 400ms var(--ease);
   }
+  .tap:hover .ring2 { transform: scale(1.09); }
+  .tap svg { width: 15px; height: 15px; fill: var(--ink); margin-left: 2px; }
 
-  .eyebrow {
-    font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--gold); margin: 0; opacity: 0.9;
-  }
-  .names {
-    font-family: "Marcellus", Georgia, serif; font-weight: 400;
-    font-size: clamp(34px, 10vw, 50px); line-height: 1.12;
-    margin: 14px 0 0; text-align: center; letter-spacing: 0.015em;
-  }
-  .names .amp { display: block; color: var(--gold); font-size: 0.55em; margin: 3px 0; }
-
-  /* play control — thin gold ring, breathing */
-  .play {
-    width: 72px; height: 72px; border-radius: 50%;
-    border: 1px solid rgba(212,169,74,0.55);
-    background: rgba(255,255,255,0.02);
-    display: grid; place-items: center; cursor: pointer;
-    position: relative; padding: 0;
-    transition: transform 500ms var(--ease), background 400ms ease, border-color 400ms ease;
-  }
-  .play::before {
-    content: ""; position: absolute; inset: -1px; border-radius: 50%;
-    border: 1px solid rgba(212,169,74,0.5);
-    animation: ripple 3s var(--ease) infinite;
-  }
-  @keyframes ripple {
-    0%   { transform: scale(1);    opacity: 0.6; }
-    70%  { transform: scale(1.45); opacity: 0; }
-    100% { transform: scale(1.45); opacity: 0; }
-  }
-  .play:hover { transform: scale(1.06); background: rgba(212,169,74,0.09); }
-  .play:active { transform: scale(0.97); }
-  .play svg { width: 19px; height: 19px; fill: var(--gold); margin-left: 3px; }
-  .play-hint {
-    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--dim); margin: 0;
-  }
-
-  /* ================= the reveal ================= */
-  .reveal {
+  /* ================= opening: black, one ring ================= */
+  .opener {
     position: absolute; inset: 0; z-index: 4;
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 0 26px; text-align: center;
-    pointer-events: none;
+    align-items: center; justify-content: center; gap: 46px;
+    background: #000; cursor: pointer;
+    transition: opacity 700ms var(--ease), transform 1000ms var(--ease);
   }
-  [data-state="done"] .reveal { pointer-events: auto; }
+  [data-state="playing"] .opener, [data-state="done"] .opener {
+    opacity: 0; transform: scale(1.08); pointer-events: none;
+  }
 
-  /* every revealed element shares this; direction and delay are per-element */
-  .r {
+  /* gold dust drifting upward */
+  .dust { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .dust i {
+    position: absolute; width: 2px; height: 2px; border-radius: 50%;
+    background: var(--glow);
+    box-shadow: 0 0 7px 1px rgba(212,169,74,0.8);
+    animation: rise linear infinite;
+  }
+  @keyframes rise {
+    0%   { transform: translateY(40px) scale(0.4); opacity: 0; }
+    18%  { opacity: 0.95; }
+    76%  { opacity: 0.45; }
+    100% { transform: translateY(-200px) scale(1); opacity: 0; }
+  }
+
+  /* breathing halo behind the ring */
+  .aura {
+    position: absolute; width: 380px; height: 380px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,169,74,0.17) 0%, transparent 62%);
+    animation: aura 5.2s ease-in-out infinite; pointer-events: none;
+  }
+  @keyframes aura {
+    0%,100% { transform: scale(0.9);  opacity: 0.5; }
+    50%     { transform: scale(1.12); opacity: 0.95; }
+  }
+
+  .seal {
+    position: relative; width: 132px; height: 132px;
+    display: grid; place-items: center;
+    background: none; border: 0; padding: 0; cursor: pointer;
+    transition: transform 560ms var(--ease);
+  }
+  .seal:hover { transform: scale(1.06); }
+  .seal:active { transform: scale(0.96); }
+  .seal:focus-visible { outline: 1px solid var(--gold); outline-offset: 16px; border-radius: 50%; }
+
+  .hoop {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 1px solid rgba(212,169,74,0.85);
+    box-shadow: inset 0 0 30px rgba(212,169,74,0.15), 0 0 26px rgba(212,169,74,0.16);
+    animation: breathe 5.2s ease-in-out infinite;
+  }
+  .hoop.inner { inset: 13px; border-color: rgba(212,169,74,0.32); box-shadow: none; animation-delay: 0.5s; }
+  @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+
+  .wave {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 1px solid rgba(212,169,74,0.55);
+    animation: wave 3.6s var(--ease) infinite;
+  }
+  .wave.b { animation-delay: 1.2s; }
+  .wave.c { animation-delay: 2.4s; }
+  @keyframes wave {
+    0%   { transform: scale(1);   opacity: 0.6; }
+    80%  { transform: scale(1.7); opacity: 0; }
+    100% { transform: scale(1.7); opacity: 0; }
+  }
+
+  /* the stone, orbiting the band */
+  .orbit { position: absolute; inset: 0; animation: spin 6s linear infinite; }
+  .stone {
+    position: absolute; top: -4px; left: calc(50% - 4px);
+    width: 8px; height: 8px; border-radius: 50%; background: #FFF6E0;
+    box-shadow: 0 0 16px 4px rgba(212,169,74,0.95), 0 0 34px 8px rgba(212,169,74,0.35);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .seal svg { width: 19px; height: 19px; fill: rgba(212,169,74,0.9); margin-left: 3px; position: relative; }
+
+  .caption { text-align: center; position: relative; }
+  .cap-1 {
+    font-size: 10.5px; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--ink); margin: 0; opacity: 0.92;
+  }
+  .cap-2 { font-size: 11px; letter-spacing: 0.05em; color: var(--dim); margin: 8px 0 0; }
+
+  /* ================= text bands ================= */
+  .band { position: absolute; left: 0; right: 0; z-index: 3; text-align: center; padding: 0 24px; pointer-events: none; }
+  [data-state="done"] .band { pointer-events: auto; }
+  .band-top { top: 0; padding-top: max(30px, env(safe-area-inset-top)); }
+  .band-bottom { bottom: 0; padding-bottom: max(26px, env(safe-area-inset-bottom)); }
+
+  /* each word materialises: drifts in, sharpens, gold bloom burns off */
+  .w {
+    display: inline-block;
     opacity: 0;
-    transform: translateY(var(--y, 30px));
+    transform: translateY(var(--wy, 16px)) scale(0.965);
     filter: blur(7px);
+    text-shadow: 0 0 16px rgba(255,230,168,0.95), 0 0 30px rgba(212,169,74,0.55);
     transition:
-      opacity   780ms var(--ease) var(--d, 0ms),
-      transform 980ms var(--ease) var(--d, 0ms),
-      filter    780ms var(--ease) var(--d, 0ms),
-      letter-spacing 1200ms var(--ease) var(--d, 0ms);
+      opacity 640ms var(--ease) var(--wd, 0ms),
+      transform 820ms var(--ease) var(--wd, 0ms),
+      filter 640ms var(--ease) var(--wd, 0ms),
+      text-shadow 1100ms ease var(--wd, 0ms);
+  }
+  [data-state="done"] .w {
+    opacity: 1; transform: none; filter: none;
+    text-shadow: 0 0 0 rgba(212,169,74,0);
+  }
+
+  .r {
+    opacity: 0; transform: translateY(var(--y, 26px)); filter: blur(7px);
+    transition:
+      opacity 700ms var(--ease) var(--d, 0ms),
+      transform 900ms var(--ease) var(--d, 0ms),
+      filter 700ms var(--ease) var(--d, 0ms);
   }
   [data-state="done"] .r { opacity: 1; transform: none; filter: none; }
 
-  /* names descend from above, and their tracking settles as they land */
-  .rv-eyebrow { --y: -26px; --d: 220ms;
-    font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--gold); margin: 0 0 12px;
-  }
-  .rv-names { --y: -46px; --d: 120ms;
+  .rv-names {
     font-family: "Marcellus", Georgia, serif;
-    font-size: clamp(30px, 8.5vw, 42px); line-height: 1.14;
-    margin: 0 0 22px; letter-spacing: 0.16em;
+    font-size: clamp(27px, 7.4vw, 36px); line-height: 1.14;
+    margin: 0 0 11px; letter-spacing: 0.02em;
   }
-  [data-state="done"] .rv-names { letter-spacing: 0.015em; }
-  .rv-names .amp { display: block; color: var(--gold); font-size: 0.56em; margin: 2px 0; }
+  .rv-names .w { display: block; }
+  .rv-names .amp { color: var(--gold); font-size: 0.55em; margin: 1px 0; }
 
-  /* the hairline draws itself across the meeting point */
+  .rv-eyebrow {
+    font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin: 0 0 11px;
+  }
   .rv-rule {
-    width: 54px; height: 1px; background: var(--gold); opacity: 0.65;
-    margin: 0 0 22px; transform: scaleX(0); transform-origin: 50% 50%;
-    transition: transform 900ms var(--ease) 430ms, opacity 500ms ease 430ms;
-    filter: none;
+    width: 48px; height: 1px; background: var(--gold); opacity: 0.65;
+    margin: 0 auto; transform: scaleX(0);
+    transition: transform 950ms var(--ease) 700ms;
   }
   [data-state="done"] .rv-rule { transform: scaleX(1); }
 
-  /* everything below rises */
-  .rv-occ  { --y: 30px; --d: 540ms;
-    font-family: "Marcellus", Georgia, serif; font-size: 19px;
-    margin: 0 0 10px; letter-spacing: 0.02em;
-  }
-  .rv-when { --y: 30px; --d: 620ms; font-size: 16px; margin: 0 0 14px; }
-  .rv-sched { --y: 30px; --d: 700ms;
+  .rv-occ  { font-family: "Marcellus", Georgia, serif; font-size: 18px; margin: 0 0 9px; letter-spacing: 0.02em; }
+  .rv-when { font-size: 15.5px; margin: 0 0 11px; }
+  .rv-sched { --y: 26px; --d: 1180ms;
     display: inline-grid; grid-template-columns: auto auto;
-    gap: 4px 18px; text-align: left; margin: 0 0 18px;
+    gap: 3px 18px; text-align: left; margin: 0 0 13px;
   }
-  .rv-sched dt { font-size: 14.5px; color: var(--dim); margin: 0; }
-  .rv-sched dd { margin: 0; font-size: 15.5px; text-align: right; font-variant-numeric: tabular-nums; }
-  .rv-where { --y: 30px; --d: 780ms;
-    font-family: "Marcellus", Georgia, serif; font-size: 17px; margin: 0 0 2px;
-  }
-  .rv-road { --y: 30px; --d: 820ms; font-size: 13.5px; color: var(--dim); margin: 0 0 26px; }
-
-  .rv-actions { --y: 30px; --d: 900ms;
-    display: flex; gap: 10px; width: 100%; max-width: 340px; margin: 0 0 20px;
+  .rv-sched dt { font-size: 14px; color: var(--dim); margin: 0; }
+  .rv-sched dd { margin: 0; font-size: 15px; text-align: right; font-variant-numeric: tabular-nums; }
+  .rv-where { font-family: "Marcellus", Georgia, serif; font-size: 16.5px; margin: 0 0 1px; }
+  .rv-road  { font-size: 13px; color: var(--dim); margin: 0 0 18px; }
+  .rv-actions { --y: 26px; --d: 1520ms;
+    display: flex; gap: 9px; max-width: 330px; margin: 0 auto;
   }
   .rv-actions a {
     flex: 1; text-align: center; text-decoration: none;
-    font-size: 13.5px; letter-spacing: 0.02em; padding: 12px 8px;
+    font-size: 13px; letter-spacing: 0.02em; padding: 11px 6px;
     border-radius: 3px; color: var(--gold);
-    border: 1px solid rgba(212,169,74,0.4);
-    background: rgba(25,18,17,0.72);
+    border: 1px solid rgba(212,169,74,0.4); background: rgba(24,17,16,0.78);
     -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-    transition: background 300ms ease, border-color 300ms ease, color 300ms ease;
+    transition: background 300ms ease, border-color 300ms ease;
   }
-  .rv-actions a:hover { background: rgba(212,169,74,0.12); border-color: var(--gold); }
+  .rv-actions a:hover { background: rgba(212,169,74,0.13); border-color: var(--gold); }
   .rv-actions a:active { background: var(--maroon); border-color: var(--maroon); color: var(--ink); }
 
-  .replay { --y: 22px; --d: 1000ms;
-    display: inline-flex; align-items: center; gap: 8px;
-    background: none; border: 0; cursor: pointer; padding: 6px 4px;
-    font-family: "Karla", sans-serif; font-size: 11px;
-    letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);
-    transition: color 300ms ease,
-      opacity 780ms var(--ease) var(--d), transform 980ms var(--ease) var(--d),
-      filter 780ms var(--ease) var(--d);
+  @media (max-height: 680px) {
+    .rv-names { font-size: clamp(23px, 6vw, 30px); }
+    .rv-road { margin-bottom: 12px; }
+    .seal { width: 112px; height: 112px; }
+    .aura { width: 300px; height: 300px; }
   }
-  .replay:hover { color: var(--gold); }
-  .replay svg { width: 13px; height: 13px; fill: currentColor; }
-
-  @media (max-height: 640px) {
-    .rv-names { font-size: clamp(26px, 7vh, 34px); margin-bottom: 16px; }
-    .rv-rule { margin-bottom: 16px; }
-    .rv-road { margin-bottom: 18px; }
-    .rv-sched { margin-bottom: 14px; }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .r, .rv-rule, .player, .idle, .replay { transition-duration: 1ms !important; }
-    .play::before { animation: none; }
-    [data-state="done"] .player { filter: none; }
+    .w, .r, .rv-rule, .player, .opener, .tap { transition-duration: 1ms !important; }
+    .wave, .orbit, .hoop, .aura, .dust i { animation: none; }
+    .w { text-shadow: none; }
   }
 </style>
 </head>
 <body>
 
-<div class="scene" id="scene" data-state="idle">
+<div class="scene" id="scene" data-state="opening">
 
   <!-- EDIT: drop your file in as invite.mp4 -->
   <div class="player">
-    <video id="v" playsinline preload="metadata" disablepictureinpicture>
+    <video id="v" muted playsinline preload="auto" disablepictureinpicture>
       <source src="invite.mp4" type="video/mp4">
     </video>
+    <div class="tap" id="tap" role="button" tabindex="0" aria-label="Play again, fullscreen">
+      <span class="ring2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
+    </div>
   </div>
 
-  <div class="idle" id="idle">
-    <div>
-      <p class="eyebrow">Together with their families</p>
-      <p class="names">Rahi<span class="amp">&amp;</span>Sahil</p>
-    </div>
-    <button class="play" id="play" type="button" aria-label="Play the invitation">
+  <div class="opener" id="opener">
+    <div class="dust" id="dust"></div>
+    <div class="aura"></div>
+
+    <button class="seal" id="seal" type="button" aria-label="Open the invitation">
+      <span class="hoop"></span>
+      <span class="hoop inner"></span>
+      <span class="wave"></span>
+      <span class="wave b"></span>
+      <span class="wave c"></span>
+      <span class="orbit"><span class="stone"></span></span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
     </button>
-    <p class="play-hint">Play invitation</p>
+
+    <div class="caption">
+      <p class="cap-1">Tap the ring</p>
+      <p class="cap-2">to open the invitation · plays with sound</p>
+    </div>
   </div>
 
-  <div class="reveal">
-    <p class="r rv-eyebrow">Together with their families</p>
-    <p class="r rv-names">Rahi<span class="amp">&amp;</span>Sahil</p>
+  <div class="band band-top">
+    <p class="rv-names">
+      <span class="w" style="--wd:140ms;--wy:-32px">Rahi</span>
+      <span class="w amp" style="--wd:260ms;--wy:-26px">&amp;</span>
+      <span class="w" style="--wd:380ms;--wy:-20px">Sahil</span>
+    </p>
+    <p class="rv-eyebrow" data-split data-from="520" data-step="55" data-up>Together with their families</p>
     <div class="rv-rule"></div>
+  </div>
 
-    <p class="r rv-occ">Ring Ceremony</p>
-    <p class="r rv-when">Wednesday, 16 December 2026</p>
+  <div class="band band-bottom">
+    <p class="rv-occ"  data-split data-from="860"  data-step="70">Ring Ceremony</p>
+    <p class="rv-when" data-split data-from="1000" data-step="50">Wednesday, 16 December 2026</p>
     <dl class="r rv-sched">
       <dt>Ceremony</dt><dd>6:00 pm</dd>
       <dt>Dinner</dt><dd>7:30 pm</dd>
     </dl>
-    <p class="r rv-where">Prakruti Party Plot</p>
-    <p class="r rv-road">Hadiyol Road</p>
-
+    <p class="rv-where" data-split data-from="1280" data-step="60">Prakruti Party Plot</p>
+    <p class="rv-road"  data-split data-from="1400" data-step="60">Hadiyol Road</p>
     <div class="r rv-actions">
       <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Rahi%20%26%20Sahil%20%E2%80%94%20Ring%20Ceremony&amp;dates=20261216T180000/20261216T220000&amp;ctz=Asia/Kolkata&amp;location=Prakruti%20Party%20Plot%2C%20Hadiyol%20Road&amp;details=Ceremony%206%3A00%20pm%20%C2%B7%20Dinner%207%3A30%20pm" target="_blank" rel="noopener">Add to calendar</a>
       <a href="https://www.google.com/maps/search/?api=1&amp;query=Prakruti%20Party%20Plot%20Hadiyol%20Road" target="_blank" rel="noopener">Open in Maps</a>
     </div>
-
-    <button class="r replay" id="replay" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V1L7 6l5 5V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg>
-      Play again
-    </button>
   </div>
 
 </div>
@@ -273,11 +329,60 @@
 (function () {
   var scene  = document.getElementById("scene");
   var v      = document.getElementById("v");
-  var play   = document.getElementById("play");
-  var replay = document.getElementById("replay");
-  var wentFs = false;
+  var seal   = document.getElementById("seal");
+  var tap    = document.getElementById("tap");
+  var opener = document.getElementById("opener");
 
-  function set(s) { scene.dataset.state = s; }
+  /* gold dust around the ring */
+  (function () {
+    var host = document.getElementById("dust");
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < 16; i++) {
+      var d = document.createElement("i");
+      d.style.left = (12 + Math.random() * 76) + "%";
+      d.style.bottom = (22 + Math.random() * 26) + "%";
+      d.style.animationDuration = (6 + Math.random() * 6).toFixed(1) + "s";
+      d.style.animationDelay = (-Math.random() * 10).toFixed(1) + "s";
+      frag.appendChild(d);
+    }
+    host.appendChild(frag);
+  })();
+
+  /* split text into words so each one materialises on its own beat */
+  Array.prototype.forEach.call(document.querySelectorAll("[data-split]"), function (el) {
+    var from = parseInt(el.getAttribute("data-from") || "0", 10);
+    var step = parseInt(el.getAttribute("data-step") || "60", 10);
+    var up   = el.hasAttribute("data-up");
+    var words = el.textContent.trim().split(/\s+/);
+    el.textContent = "";
+    words.forEach(function (word, i) {
+      var s = document.createElement("span");
+      s.className = "w";
+      s.textContent = word;
+      s.style.setProperty("--wd", (from + i * step) + "ms");
+      if (up) s.style.setProperty("--wy", "-18px");
+      el.appendChild(s);
+      if (i < words.length - 1) el.appendChild(document.createTextNode(" "));
+    });
+  });
+
+  /* video sizing derived from the real band heights — cannot collide */
+  var bandTop = scene.querySelector(".band-top");
+  var bandBot = scene.querySelector(".band-bottom");
+  function fit() {
+    var gap = 16;
+    var avail = scene.clientHeight - bandTop.offsetHeight - bandBot.offsetHeight - gap * 2;
+    if (avail < 90) avail = 90;
+    var maxW = Math.min(scene.clientWidth * 0.52, 250);
+    var h = Math.min(avail, maxW * 16 / 9);
+    scene.style.setProperty("--vid-h", h + "px");
+    scene.style.setProperty("--vid-top", (bandTop.offsetHeight + gap + avail / 2) + "px");
+  }
+  fit();
+  window.addEventListener("resize", fit);
+  window.addEventListener("orientationchange", function () { setTimeout(fit, 260); });
+
+  function set(s) { if (s === "done") fit(); scene.dataset.state = s; }
 
   function fullscreen() {
     try {
@@ -293,34 +398,29 @@
     } catch (e) {}
   }
 
-  function start() {
+  /* a trusted click unlocks unmuted audio AND fullscreen together */
+  function launch() {
     set("playing");
-    v.currentTime = 0;
-    v.muted = false;            // a real tap started this, so audio is allowed
-    var p = v.play();
-    if (p && p.catch) p.catch(function () { set("done"); });   // can't play? show the details
-    if (!wentFs) { wentFs = true; fullscreen(); }
-  }
-
-  play.addEventListener("click", start);
-
-  replay.addEventListener("click", function () {
-    set("playing");
+    v.muted = false;
     v.currentTime = 0;
     var p = v.play();
     if (p && p.catch) p.catch(function () { set("done"); });
     fullscreen();
+  }
+
+  seal.addEventListener("click", function (e) { e.stopPropagation(); launch(); });
+  opener.addEventListener("click", launch);
+  tap.addEventListener("click", function (e) { e.stopPropagation(); launch(); });
+  tap.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); launch(); }
   });
 
   v.addEventListener("ended", function () {
     exitFullscreen();
-    // let the browser finish its own exit-fullscreen animation first, so the
-    // two transitions don't fight each other
-    setTimeout(function () { set("done"); }, 260);
+    setTimeout(function () { set("done"); }, 280);
   });
 
-  // If the video is missing or won't decode, go straight to the details —
-  // the page is an invitation first and a video second.
+  /* no video? straight to the invitation */
   function noVideo() { set("done"); }
   v.addEventListener("error", noVideo);
   var src = v.querySelector("source");
