@@ -4,12 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rahi &amp; Sahil — Ring Ceremony</title>
-<meta name="description" content="Ring ceremony invitation — Wednesday, 16 December 2026.">
+<meta name="description" content="Sudhir &amp; Rajul Patel invite you to the engagement ceremony of Rahi &amp; Sahil — Wednesday, 16 December 2026 · Prakruti Party Plot, Himmatnagar.">
 <meta name="theme-color" content="#000000">
 
 <meta property="og:title" content="Rahi &amp; Sahil — Ring Ceremony">
-<meta property="og:description" content="Wednesday, 16 December 2026 · Prakruti Party Plot">
+<meta property="og:description" content="Sudhir &amp; Rajul Patel invite you to the engagement ceremony of Rahi &amp; Sahil · Wednesday, 16 December 2026 · Prakruti Party Plot, Himmatnagar">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://krishpatel3778.github.io/rahi-sahil-invite/">
+<meta property="og:image" content="https://krishpatel3778.github.io/rahi-sahil-invite/preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +30,7 @@
     --bg:    #0B0807;
     --ease:  cubic-bezier(0.16, 1, 0.3, 1);
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; margin: 0; background: #000; }
   body {
     color: var(--ink);
@@ -33,15 +38,21 @@
     font-size: 15px; line-height: 1.6;
     -webkit-font-smoothing: antialiased; overflow: hidden;
   }
+  button { font: inherit; color: inherit; }
 
   .scene {
     position: relative; width: 100%;
     height: 100vh; height: 100dvh;
     margin-inline: auto; overflow: hidden; background: #000;
+    container-type: inline-size;
     transition: background 900ms var(--ease);
   }
   @media (min-aspect-ratio: 3/4) {
     .scene { max-width: calc(100dvh * 9 / 16); box-shadow: 0 0 110px rgba(0,0,0,0.9); }
+  }
+  /* landscape phones: a 9:16 column would be ~220px wide — use the full width */
+  @media (orientation: landscape) and (max-height: 520px) {
+    .scene { max-width: none; box-shadow: none; }
   }
   .scene[data-state="done"] { background: var(--bg); }
 
@@ -54,7 +65,8 @@
     transition:
       width 1100ms var(--ease), height 1100ms var(--ease),
       top 1100ms var(--ease), transform 1100ms var(--ease),
-      border-radius 900ms var(--ease), box-shadow 900ms var(--ease);
+      border-radius 900ms var(--ease), box-shadow 900ms var(--ease),
+      opacity 500ms ease;
   }
   [data-state="done"] .player {
     top: var(--vid-top, 50%);
@@ -64,34 +76,37 @@
     border-radius: 4px;
     box-shadow: 0 20px 56px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,169,74,0.3);
   }
-  video { width: 100%; height: 100%; object-fit: cover; display: block; background: #000; }
-  /* nothing is given away before the ring is tapped */
+  /* no room for the card (landscape / tiny screens) or no video at all */
+  .compact[data-state="done"] .player,
+  .no-video .player { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  /* contain, not cover: on a tall phone cover crops ~9% off each side, which
+     cuts into the couple at the left edge of the frame. The card is exactly
+     9:16, so it looks identical there. */
+  video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
   [data-state="opening"] video { opacity: 0; }
 
-  /* FULLSCREEN: never crop.
-     `cover` fills the frame, which is right for the 9:16 card but ruinous in
-     fullscreen — a 9:16 video in a 16:9 screen gets scaled until it covers the
-     width, so most of the picture ends up above and below the viewport. On a
-     phone it clips the sides; on a desktop you see a narrow horizontal slice.
-     In fullscreen we letterbox instead, so the whole frame is visible.
-     Each selector gets its OWN rule on purpose: in CSS, one unrecognised
-     selector in a comma-separated list invalidates the whole rule, and no
-     engine knows every vendor's fullscreen pseudo-class. Grouped, they all
-     die together. */
-  video.fs               { object-fit: contain; background: #000; }
-  video:fullscreen       { object-fit: contain; background: #000; }
+  .scene:fullscreen { max-width: none; width: 100%; height: 100%; }
+  .scene:-webkit-full-screen { max-width: none; width: 100%; height: 100%; }
+
+  /* FULLSCREEN: letterbox, never crop. One rule per selector on purpose —
+     an unknown vendor pseudo-class invalidates a grouped rule. */
+  video.fs                  { object-fit: contain; background: #000; }
+  video:fullscreen          { object-fit: contain; background: #000; }
   video:-webkit-full-screen { object-fit: contain; background: #000; }
   video:-moz-full-screen    { object-fit: contain; background: #000; }
 
+  /* card overlay: replay / resume */
   .tap {
     position: absolute; inset: 0; z-index: 2;
-    display: grid; place-items: center;
-    background: rgba(8,5,4,0.34);
+    display: grid; place-content: center; justify-items: center; gap: 10px;
+    background: rgba(8,5,4,0.34); border: 0; padding: 0; cursor: pointer;
     opacity: 0; pointer-events: none;
-    transition: opacity 600ms var(--ease) 950ms, background 300ms ease;
+    transition: opacity 250ms ease, background 300ms ease;
   }
-  [data-state="done"] .tap { opacity: 1; pointer-events: auto; }
+  [data-state="done"] .tap { opacity: 1; pointer-events: auto; transition: opacity 600ms var(--ease) 950ms, background 300ms ease; }
   .tap:hover { background: rgba(8,5,4,0.14); }
+  .tap:focus-visible { outline: 1px solid var(--gold); outline-offset: -4px; }
   .ring2 {
     width: 52px; height: 52px; border-radius: 50%;
     border: 1px solid rgba(244,235,221,0.85);
@@ -100,95 +115,110 @@
     transition: transform 400ms var(--ease);
   }
   .tap:hover .ring2 { transform: scale(1.09); }
-  .tap svg { width: 15px; height: 15px; fill: var(--ink); margin-left: 2px; }
+  .ring2 svg { width: 15px; height: 15px; fill: var(--ink); margin-left: 2px; }
+  .tap-label { font-size: 9.5px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--ink); opacity: 0.85; }
 
-  /* ================= opening: black, one ring ================= */
+  /* buffering: only shows if the wait is longer than ~0.4s, so no flicker */
+  .buffer {
+    position: absolute; left: 50%; top: 50%; z-index: 1;
+    width: 38px; height: 38px; margin: -19px 0 0 -19px; border-radius: 50%;
+    border: 1.5px solid rgba(212,169,74,0.18); border-top-color: var(--gold);
+    opacity: 0; pointer-events: none;
+    animation: spin 0.9s linear infinite;
+    transition: opacity 200ms ease;
+  }
+  .is-waiting[data-state="playing"] .buffer { opacity: 1; transition-delay: 400ms; }
+
+  /* escape hatch while the video plays inline */
+  .skip {
+    position: absolute; z-index: 5;
+    top: max(16px, env(safe-area-inset-top)); right: 14px;
+    padding: 7px 13px; border-radius: 99px; cursor: pointer;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--ink); background: rgba(12,8,7,0.45);
+    border: 1px solid rgba(244,235,221,0.28);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    opacity: 0; pointer-events: none; transform: translateY(-6px);
+    transition: opacity 400ms ease, transform 400ms var(--ease);
+  }
+  [data-state="playing"] .skip { opacity: 0.8; pointer-events: auto; transform: none; transition-delay: 1400ms; }
+  .skip:hover { opacity: 1; }
+
+  /* ================= opening ================= */
   .opener {
     position: absolute; inset: 0; z-index: 4;
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 46px;
+    align-items: center; justify-content: center; gap: 34px;
     background: #000; cursor: pointer;
-    transition: opacity 700ms var(--ease), transform 1000ms var(--ease);
+    -webkit-user-select: none; user-select: none;
+    transition: opacity 900ms var(--ease) 180ms, visibility 0s linear 1100ms;
   }
   [data-state="playing"] .opener, [data-state="done"] .opener {
-    opacity: 0; transform: scale(1.08); pointer-events: none;
+    opacity: 0; visibility: hidden; pointer-events: none;
   }
+  .fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-  /* gold dust drifting upward */
-  .dust { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-  .dust i {
-    position: absolute; width: 2px; height: 2px; border-radius: 50%;
-    background: var(--glow);
-    box-shadow: 0 0 7px 1px rgba(212,169,74,0.8);
-    animation: rise linear infinite;
-  }
-  @keyframes rise {
-    0%   { transform: translateY(40px) scale(0.4); opacity: 0; }
-    18%  { opacity: 0.95; }
-    76%  { opacity: 0.45; }
-    100% { transform: translateY(-200px) scale(1); opacity: 0; }
-  }
-
-  /* breathing halo behind the ring */
   .aura {
-    position: absolute; width: 380px; height: 380px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(212,169,74,0.17) 0%, transparent 62%);
+    position: absolute; left: 50%; top: 55%; z-index: -1;
+    width: 420px; height: 420px; margin: -210px 0 0 -210px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,169,74,0.16) 0%, transparent 62%);
     animation: aura 5.2s ease-in-out infinite; pointer-events: none;
   }
   @keyframes aura {
     0%,100% { transform: scale(0.9);  opacity: 0.5; }
     50%     { transform: scale(1.12); opacity: 0.95; }
   }
+  /* bloom on tap — warms toward the ivory first frame of the video */
+  .flash {
+    position: absolute; left: 50%;
+    width: 160px; height: 160px; margin: -80px 0 0 -80px; border-radius: 50%; top: 55%;
+    background: radial-gradient(circle, #FFF8EA 0%, rgba(255,236,190,0.75) 30%, rgba(212,169,74,0) 70%);
+    opacity: 0; pointer-events: none; z-index: 2;
+  }
 
   .seal {
-    position: relative; width: 132px; height: 132px;
-    display: grid; place-items: center;
+    position: relative; display: block; width: min(230px, 62vw); width: min(230px, 62cqw); aspect-ratio: 140 / 112;
     background: none; border: 0; padding: 0; cursor: pointer;
-    transition: transform 560ms var(--ease);
+    perspective: 600px;
   }
-  .seal:hover { transform: scale(1.06); }
-  .seal:active { transform: scale(0.96); }
-  .seal:focus-visible { outline: 1px solid var(--gold); outline-offset: 16px; border-radius: 50%; }
-
-  .hoop {
-    position: absolute; inset: 0; border-radius: 50%;
-    border: 1px solid rgba(212,169,74,0.85);
-    box-shadow: inset 0 0 30px rgba(212,169,74,0.15), 0 0 26px rgba(212,169,74,0.16);
-    animation: breathe 5.2s ease-in-out infinite;
-  }
-  .hoop.inner { inset: 13px; border-color: rgba(212,169,74,0.32); box-shadow: none; animation-delay: 0.5s; }
-  @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+  .seal:focus-visible { outline: 1px solid var(--gold); outline-offset: 14px; border-radius: 12px; }
+  .seal svg { width: 100%; height: 100%; overflow: visible; display: block; }
+  .tilt { display: block; position: relative; z-index: 1; width: 100%; height: 100%; transition: transform 600ms var(--ease); transform-style: preserve-3d; }
+  .seal:active .tilt { transform: scale(0.96); }
+  .breath { transform-box: view-box; transform-origin: 50% 55%; animation: breathe 5.2s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.025); } }
 
   .wave {
-    position: absolute; inset: 0; border-radius: 50%;
-    border: 1px solid rgba(212,169,74,0.55);
-    animation: wave 3.6s var(--ease) infinite;
+    position: absolute; left: 50%; top: 55%;
+    width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%;
+    border: 1px solid rgba(212,169,74,0.5);
+    opacity: 0; pointer-events: none;
   }
-  .wave.b { animation-delay: 1.2s; }
-  .wave.c { animation-delay: 2.4s; }
+  .ready .wave { animation: wave 3.6s var(--ease) infinite; }
+  .ready .wave.b { animation-delay: 1.2s; }
+  .ready .wave.c { animation-delay: 2.4s; }
   @keyframes wave {
-    0%   { transform: scale(1);   opacity: 0.6; }
-    80%  { transform: scale(1.7); opacity: 0; }
-    100% { transform: scale(1.7); opacity: 0; }
+    0%   { transform: scale(0.8); opacity: 0.55; }
+    80%  { transform: scale(1.9); opacity: 0; }
+    100% { transform: scale(1.9); opacity: 0; }
   }
 
-  /* the stone, orbiting the band */
-  .orbit { position: absolute; inset: 0; animation: spin 6s linear infinite; }
-  .stone {
-    position: absolute; top: -4px; left: calc(50% - 4px);
-    width: 8px; height: 8px; border-radius: 50%; background: #FFF6E0;
-    box-shadow: 0 0 16px 4px rgba(212,169,74,0.95), 0 0 34px 8px rgba(212,169,74,0.35);
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .seal svg { width: 19px; height: 19px; fill: rgba(212,169,74,0.9); margin-left: 3px; position: relative; }
+  .stone { transform-box: fill-box; transform-origin: 50% 100%; }
+  .glint { opacity: 0; }
+  .spark { transform-box: fill-box; transform-origin: 50% 50%; opacity: 0; }
 
   .caption { text-align: center; position: relative; }
   .cap-1 {
-    font-size: 10.5px; letter-spacing: 0.28em; text-transform: uppercase;
-    color: var(--ink); margin: 0; opacity: 0.92;
+    font-size: 10.5px; letter-spacing: 0.28em; text-transform: uppercase; margin: 0;
+    color: var(--ink);
+    background: linear-gradient(100deg, var(--ink) 40%, #FFF3CF 50%, var(--ink) 60%) 0 0 / 300% 100%;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    animation: sheen 4.5s ease-in-out infinite 2.2s;
   }
+  @keyframes sheen { 0% { background-position: 100% 0; } 60%,100% { background-position: 0 0; } }
   .cap-2 { font-size: 11px; letter-spacing: 0.05em; color: var(--dim); margin: 8px 0 0; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ================= text bands ================= */
   .band { position: absolute; left: 0; right: 0; z-index: 3; text-align: center; padding: 0 24px; pointer-events: none; }
@@ -196,55 +226,75 @@
   .band-top { top: 0; padding-top: max(30px, env(safe-area-inset-top)); }
   .band-bottom { bottom: 0; padding-bottom: max(26px, env(safe-area-inset-bottom)); }
 
-  /* each word materialises: drifts in, sharpens, gold bloom burns off */
+  /* compact: not enough height for the card — stack the text and let it scroll */
+  .compact[data-state="done"] {
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    display: flex; flex-direction: column; gap: 22px;
+  }
+  .compact[data-state="done"] .band { position: relative; flex: none; }
+  /* auto margins centre it but, unlike justify-content:center, never clip the top */
+  .compact[data-state="done"] .band-top { margin-top: auto; }
+  .compact[data-state="done"] .band-bottom { margin-bottom: auto; }
+
+  /* Exit is fast and undelayed; the staggered delays apply only on the way IN.
+     (Using the same delays both ways left text hanging over the video.) */
   .w {
     display: inline-block;
     opacity: 0;
     transform: translateY(var(--wy, 16px)) scale(0.965);
     filter: blur(7px);
     text-shadow: 0 0 16px rgba(255,230,168,0.95), 0 0 30px rgba(212,169,74,0.55);
+    transition: opacity 220ms ease, transform 220ms ease, filter 220ms ease, text-shadow 220ms ease;
+  }
+  [data-state="done"] .w {
+    opacity: 1; transform: none; filter: none;
+    text-shadow: 0 0 0 rgba(212,169,74,0);
     transition:
       opacity 640ms var(--ease) var(--wd, 0ms),
       transform 820ms var(--ease) var(--wd, 0ms),
       filter 640ms var(--ease) var(--wd, 0ms),
       text-shadow 1100ms ease var(--wd, 0ms);
   }
-  [data-state="done"] .w {
-    opacity: 1; transform: none; filter: none;
-    text-shadow: 0 0 0 rgba(212,169,74,0);
-  }
 
   .r {
     opacity: 0; transform: translateY(var(--y, 26px)); filter: blur(7px);
+    transition: opacity 220ms ease, transform 220ms ease, filter 220ms ease;
+  }
+  [data-state="done"] .r {
+    opacity: 1; transform: none; filter: none;
     transition:
       opacity 700ms var(--ease) var(--d, 0ms),
       transform 900ms var(--ease) var(--d, 0ms),
       filter 700ms var(--ease) var(--d, 0ms);
   }
-  [data-state="done"] .r { opacity: 1; transform: none; filter: none; }
 
   .rv-names {
     font-family: "Marcellus", Georgia, serif;
-    font-size: clamp(27px, 7.4vw, 36px); line-height: 1.14;
-    margin: 0 0 11px; letter-spacing: 0.02em;
+    font-size: clamp(27px, 7.4vw, 36px);
+    font-size: clamp(24px, 9.4cqw, 36px);
+    line-height: 1.14; margin: 0 0 11px; letter-spacing: 0.02em;
   }
   .rv-names .w { display: block; }
   .rv-names .amp { color: var(--gold); font-size: 0.55em; margin: 1px 0; }
 
+  .rv-hosts {
+    font-family: "Marcellus", Georgia, serif;
+    font-size: 15px; letter-spacing: 0.06em; color: var(--ink); margin: 0 0 3px;
+  }
   .rv-eyebrow {
-    font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--gold); margin: 0 0 11px;
+    font-size: 9.5px; letter-spacing: 0.22em; line-height: 1.7; text-transform: uppercase;
+    color: var(--gold); margin: 0 auto 12px; max-width: 290px;
   }
   .rv-rule {
     width: 48px; height: 1px; background: var(--gold); opacity: 0.65;
     margin: 0 auto; transform: scaleX(0);
-    transition: transform 950ms var(--ease) 700ms;
+    transition: transform 220ms ease;
   }
-  [data-state="done"] .rv-rule { transform: scaleX(1); }
+  [data-state="done"] .rv-rule { transform: scaleX(1); transition: transform 950ms var(--ease) 950ms; }
 
   .rv-occ  { font-family: "Marcellus", Georgia, serif; font-size: 18px; margin: 0 0 9px; letter-spacing: 0.02em; }
   .rv-when { font-size: 15.5px; margin: 0 0 11px; }
-  .rv-sched { --y: 26px; --d: 1180ms;
+  .rv-sched { --y: 26px; --d: 1380ms;
     display: inline-grid; grid-template-columns: auto auto;
     gap: 3px 18px; text-align: left; margin: 0 0 13px;
   }
@@ -252,29 +302,31 @@
   .rv-sched dd { margin: 0; font-size: 15px; text-align: right; font-variant-numeric: tabular-nums; }
   .rv-where { font-family: "Marcellus", Georgia, serif; font-size: 16.5px; margin: 0 0 1px; }
   .rv-road  { font-size: 13px; color: var(--dim); margin: 0 0 18px; }
-  .rv-actions { --y: 26px; --d: 1520ms;
-    display: flex; gap: 9px; max-width: 330px; margin: 0 auto;
+  .rv-actions { --y: 26px; --d: 1720ms;
+    display: flex; flex-wrap: wrap; gap: 9px; max-width: 330px; margin: 0 auto;
   }
-  .rv-actions a {
-    flex: 1; text-align: center; text-decoration: none;
+  .rv-actions a, .rv-actions button {
+    flex: 1 1 0; min-width: 0; text-align: center; text-decoration: none; cursor: pointer;
     font-size: 13px; letter-spacing: 0.02em; padding: 11px 6px;
     border-radius: 3px; color: var(--gold);
     border: 1px solid rgba(212,169,74,0.4); background: rgba(24,17,16,0.78);
     -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     transition: background 300ms ease, border-color 300ms ease;
   }
-  .rv-actions a:hover { background: rgba(212,169,74,0.13); border-color: var(--gold); }
-  .rv-actions a:active { background: var(--maroon); border-color: var(--maroon); color: var(--ink); }
+  .rv-actions a:hover, .rv-actions button:hover { background: rgba(212,169,74,0.13); border-color: var(--gold); }
+  .rv-actions a:active, .rv-actions button:active { background: var(--maroon); border-color: var(--maroon); color: var(--ink); }
+  .rv-replay { display: none; flex-basis: 100% !important; }
+  .compact .rv-replay:not([hidden]) { display: block; }
 
   @media (max-height: 680px) {
     .rv-names { font-size: clamp(23px, 6vw, 30px); }
     .rv-road { margin-bottom: 12px; }
-    .seal { width: 112px; height: 112px; }
-    .aura { width: 300px; height: 300px; }
+    .seal { width: min(190px, 56vw); width: min(190px, 56cqw); }
+    .aura { width: 320px; height: 320px; margin: -160px 0 0 -160px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .w, .r, .rv-rule, .player, .opener, .tap { transition-duration: 1ms !important; }
-    .wave, .orbit, .hoop, .aura, .dust i { animation: none; }
+    .w, .r, .rv-rule, .player, .opener, .tap, .skip { transition-duration: 1ms !important; transition-delay: 0ms !important; }
+    .wave, .aura, .breath, .cap-1, .buffer { animation: none !important; }
     .w { text-shadow: none; }
   }
 </style>
@@ -283,58 +335,123 @@
 
 <div class="scene" id="scene" data-state="opening">
 
-  <!-- EDIT: drop your file in as invite.mp4 -->
   <div class="player">
     <video id="v" muted playsinline preload="auto" disablepictureinpicture>
       <source src="invite.mp4" type="video/mp4">
     </video>
-    <div class="tap" id="tap" role="button" tabindex="0" aria-label="Play again, fullscreen">
+    <span class="buffer" aria-hidden="true"></span>
+    <button class="tap" id="tap" type="button" aria-label="Watch the invitation again">
       <span class="ring2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>
-    </div>
+      <span class="tap-label" id="tapLabel">Watch again</span>
+    </button>
   </div>
 
-  <div class="opener" id="opener">
-    <div class="dust" id="dust"></div>
-    <div class="aura"></div>
+  <button class="skip" id="skip" type="button">Skip to invitation</button>
 
-    <button class="seal" id="seal" type="button" aria-label="Open the invitation">
-      <span class="hoop"></span>
-      <span class="hoop inner"></span>
-      <span class="wave"></span>
-      <span class="wave b"></span>
-      <span class="wave c"></span>
-      <span class="orbit"><span class="stone"></span></span>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+  <div class="opener" id="opener">
+    <canvas class="fx" id="fx" aria-hidden="true"></canvas>
+    <button class="seal" id="seal" type="button" aria-label="Open the invitation (plays with sound)">
+      <span class="aura"></span>
+      <span class="wave"></span><span class="wave b"></span><span class="wave c"></span>
+      <span class="tilt" id="tilt">
+        <svg id="rings" viewBox="30 22 140 112" aria-hidden="true">
+          <defs>
+            <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0"    stop-color="#6E4F1C"/>
+              <stop offset="0.32" stop-color="#F6DE9C"/>
+              <stop offset="0.5"  stop-color="#D4A94A"/>
+              <stop offset="0.72" stop-color="#FBE8B4"/>
+              <stop offset="1"    stop-color="#6E4F1C"/>
+              <animateTransform attributeName="gradientTransform" type="rotate"
+                from="0 .5 .5" to="360 .5 .5" dur="10s" repeatCount="indefinite"/>
+            </linearGradient>
+            <linearGradient id="gem" x1="0" y1="0" x2="0.6" y2="1">
+              <stop offset="0"   stop-color="#FFFFFF"/>
+              <stop offset="0.5" stop-color="#F3E7CC"/>
+              <stop offset="1"   stop-color="#BFA46A"/>
+            </linearGradient>
+            <radialGradient id="halo">
+              <stop offset="0"   stop-color="#FFF4D6" stop-opacity="0.9"/>
+              <stop offset="0.4" stop-color="#D4A94A" stop-opacity="0.35"/>
+              <stop offset="1"   stop-color="#D4A94A" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="1.6"/>
+            </filter>
+            <!-- ring A passes OVER ring B at the lower crossing -->
+            <clipPath id="front"><circle cx="100" cy="114.5" r="9"/></clipPath>
+          </defs>
+
+          <g class="breath">
+            <!-- ring A (left) -->
+            <g transform="rotate(-150 78 86)">
+              <circle class="drawA" cx="78" cy="86" r="36" fill="none" stroke="url(#gold)" stroke-width="4.2"/>
+              <circle class="drawA" cx="78" cy="86" r="34.3" fill="none" stroke="#FFF3D0" stroke-opacity="0.45" stroke-width="0.7"/>
+              <circle class="glint glintA" cx="78" cy="86" r="36" fill="none" stroke="#FFF8E6" stroke-width="2.4" stroke-linecap="round" filter="url(#soft)"/>
+            </g>
+            <!-- ring B (right) -->
+            <g transform="rotate(-90 122 86)">
+              <circle class="drawB" cx="122" cy="86" r="36" fill="none" stroke="url(#gold)" stroke-width="4.2"/>
+              <circle class="drawB" cx="122" cy="86" r="34.3" fill="none" stroke="#FFF3D0" stroke-opacity="0.45" stroke-width="0.7"/>
+              <circle class="glint glintB" cx="122" cy="86" r="36" fill="none" stroke="#FFF8E6" stroke-width="2.4" stroke-linecap="round" filter="url(#soft)"/>
+            </g>
+            <!-- ring A again, clipped to the lower crossing: the interlock -->
+            <g clip-path="url(#front)">
+              <g transform="rotate(-150 78 86)">
+                <circle class="drawA" cx="78" cy="86" r="36" fill="none" stroke="#000" stroke-width="7.5"/>
+                <circle class="drawA" cx="78" cy="86" r="36" fill="none" stroke="url(#gold)" stroke-width="4.2"/>
+                <circle class="drawA" cx="78" cy="86" r="34.3" fill="none" stroke="#FFF3D0" stroke-opacity="0.45" stroke-width="0.7"/>
+              </g>
+            </g>
+
+            <!-- the stone, set on ring B -->
+            <circle class="halo" cx="122" cy="42" r="20" fill="url(#halo)" opacity="0"/>
+            <g class="stone" id="stone">
+              <path d="M113.5 41 L118 36 L126 36 L130.5 41 L122 50.5 Z" fill="url(#gem)" stroke="#FFF6E0" stroke-width="0.6" stroke-linejoin="round"/>
+              <path d="M113.5 41 L130.5 41 M118 36 L119.5 41 L122 36 L124.5 41 L126 36 M119.5 41 L122 50.5 L124.5 41"
+                    fill="none" stroke="#9C8150" stroke-opacity="0.55" stroke-width="0.45"/>
+              <path d="M118 36 L122 36 L119.5 41 L113.5 41 Z" fill="#FFFFFF" fill-opacity="0.55"/>
+            </g>
+
+            <path class="spark s1" fill="#FFF8E6" d="M131 25c.5 4 .9 4.4 5 5-4.1.6-4.5 1-5 5-.5-4-.9-4.4-5-5 4.1-.6 4.5-1 5-5z"/>
+            <path class="spark s2" fill="#FFF8E6" d="M58 58c.3 2.6.6 2.9 3.4 3.3-2.8.4-3.1.7-3.4 3.3-.3-2.6-.6-2.9-3.4-3.3 2.8-.4 3.1-.7 3.4-3.3z"/>
+            <path class="spark s3" fill="#FFF8E6" d="M150 104c.3 2.4.6 2.7 3 3-2.4.3-2.7.6-3 3-.3-2.4-.6-2.7-3-3 2.4-.3 2.7-.6 3-3z"/>
+          </g>
+        </svg>
+      </span>
+      <span class="flash" id="flash"></span>
     </button>
 
-    <div class="caption">
-      <p class="cap-1">Tap the ring</p>
+    <div class="caption" id="caption">
+      <p class="cap-1">Tap the rings</p>
       <p class="cap-2">to open the invitation · plays with sound</p>
     </div>
   </div>
 
   <div class="band band-top">
+    <p class="rv-hosts" data-split data-from="100" data-step="70" data-up>Sudhir &amp; Rajul Patel</p>
+    <p class="rv-eyebrow" data-split data-from="260" data-step="40" data-up>invite you to the engagement ceremony of</p>
     <p class="rv-names">
-      <span class="w" style="--wd:140ms;--wy:-32px">Rahi</span>
-      <span class="w amp" style="--wd:260ms;--wy:-26px">&amp;</span>
-      <span class="w" style="--wd:380ms;--wy:-20px">Sahil</span>
+      <span class="w" style="--wd:560ms;--wy:-32px">Rahi</span>
+      <span class="w amp" style="--wd:680ms;--wy:-26px">&amp;</span>
+      <span class="w" style="--wd:800ms;--wy:-20px">Sahil</span>
     </p>
-    <p class="rv-eyebrow" data-split data-from="520" data-step="55" data-up>Together with their families</p>
     <div class="rv-rule"></div>
   </div>
 
   <div class="band band-bottom">
-    <p class="rv-occ"  data-split data-from="860"  data-step="70">Ring Ceremony</p>
-    <p class="rv-when" data-split data-from="1000" data-step="50">Wednesday, 16 December 2026</p>
+    <p class="rv-occ"  data-split data-from="1060"  data-step="70">Ring Ceremony</p>
+    <p class="rv-when" data-split data-from="1200" data-step="50">Wednesday, 16 December 2026</p>
     <dl class="r rv-sched">
       <dt>Ceremony</dt><dd>6:00 pm</dd>
       <dt>Dinner</dt><dd>7:30 pm</dd>
     </dl>
-    <p class="rv-where" data-split data-from="1280" data-step="60">Prakruti Party Plot</p>
-    <p class="rv-road"  data-split data-from="1400" data-step="60">Hadiyol Road</p>
+    <p class="rv-where" data-split data-from="1480" data-step="60">Prakruti Party Plot</p>
+    <p class="rv-road"  data-split data-from="1600" data-step="60">Hadiyol Road, Himmatnagar</p>
     <div class="r rv-actions">
-      <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Rahi%20%26%20Sahil%20%E2%80%94%20Ring%20Ceremony&amp;dates=20261216T180000/20261216T220000&amp;ctz=Asia/Kolkata&amp;location=Prakruti%20Party%20Plot%2C%20Hadiyol%20Road&amp;details=Ceremony%206%3A00%20pm%20%C2%B7%20Dinner%207%3A30%20pm" target="_blank" rel="noopener">Add to calendar</a>
-      <a href="https://www.google.com/maps/search/?api=1&amp;query=Prakruti%20Party%20Plot%20Hadiyol%20Road" target="_blank" rel="noopener">Open in Maps</a>
+      <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Rahi%20%26%20Sahil%20%E2%80%94%20Ring%20Ceremony&amp;dates=20261216T180000/20261216T220000&amp;ctz=Asia/Kolkata&amp;location=Prakruti%20Party%20Plot%2C%20Hadiyol%20Road%2C%20Himmatnagar%2C%20Gujarat&amp;details=Ceremony%206%3A00%20pm%20%C2%B7%20Dinner%207%3A30%20pm" target="_blank" rel="noopener">Add to calendar</a>
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=Prakruti%20Party%20Plot%2C%20Hadiyol%20Road%2C%20Himmatnagar%2C%20Gujarat" target="_blank" rel="noopener">Open in Maps</a>
+      <button class="rv-replay" id="replay" type="button">Watch the video</button>
     </div>
   </div>
 
@@ -342,28 +459,22 @@
 
 <script>
 (function () {
-  var scene  = document.getElementById("scene");
-  var v      = document.getElementById("v");
-  var seal   = document.getElementById("seal");
-  var tap    = document.getElementById("tap");
-  var opener = document.getElementById("opener");
+  "use strict";
+  var scene   = document.getElementById("scene");
+  var v       = document.getElementById("v");
+  var seal    = document.getElementById("seal");
+  var tap     = document.getElementById("tap");
+  var tapLbl  = document.getElementById("tapLabel");
+  var skip    = document.getElementById("skip");
+  var replay  = document.getElementById("replay");
+  var opener  = document.getElementById("opener");
+  var bandTop = scene.querySelector(".band-top");
+  var bandBot = scene.querySelector(".band-bottom");
 
-  /* gold dust around the ring */
-  (function () {
-    var host = document.getElementById("dust");
-    var frag = document.createDocumentFragment();
-    for (var i = 0; i < 16; i++) {
-      var d = document.createElement("i");
-      d.style.left = (12 + Math.random() * 76) + "%";
-      d.style.bottom = (22 + Math.random() * 26) + "%";
-      d.style.animationDuration = (6 + Math.random() * 6).toFixed(1) + "s";
-      d.style.animationDelay = (-Math.random() * 10).toFixed(1) + "s";
-      frag.appendChild(d);
-    }
-    host.appendChild(frag);
-  })();
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var canAnimate = !!Element.prototype.animate && !reduce;
 
-  /* split text into words so each one materialises on its own beat */
+  /* ---------- split text into words ---------- */
   Array.prototype.forEach.call(document.querySelectorAll("[data-split]"), function (el) {
     var from = parseInt(el.getAttribute("data-from") || "0", 10);
     var step = parseInt(el.getAttribute("data-step") || "60", 10);
@@ -381,78 +492,351 @@
     });
   });
 
-  /* video sizing derived from the real band heights — cannot collide */
-  var bandTop = scene.querySelector(".band-top");
-  var bandBot = scene.querySelector(".band-bottom");
+  /* ---------- layout: card size from the real band heights ---------- */
+  var compact = false;
   function fit() {
     var gap = 16;
     var avail = scene.clientHeight - bandTop.offsetHeight - bandBot.offsetHeight - gap * 2;
-    if (avail < 90) avail = 90;
+    // hysteresis so the layout can't flap at the threshold
+    if (!compact && avail < 110) compact = true;
+    else if (compact && avail > 150) compact = false;
+    scene.classList.toggle("compact", compact);
+    var a = Math.max(avail, 90);
     var maxW = Math.min(scene.clientWidth * 0.52, 250);
-    var h = Math.min(avail, maxW * 16 / 9);
+    var h = Math.min(a, maxW * 16 / 9);
     scene.style.setProperty("--vid-h", h + "px");
-    scene.style.setProperty("--vid-top", (bandTop.offsetHeight + gap + avail / 2) + "px");
+    scene.style.setProperty("--vid-top", (bandTop.offsetHeight + gap + a / 2) + "px");
+  }
+  var fitQueued = false;
+  function queueFit() {
+    if (fitQueued) return; fitQueued = true;
+    requestAnimationFrame(function () { fitQueued = false; fit(); });
   }
   fit();
-  window.addEventListener("resize", fit);
+  window.addEventListener("resize", queueFit);
   window.addEventListener("orientationchange", function () { setTimeout(fit, 260); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);  // web fonts change band heights
 
-  function set(s) { if (s === "done") fit(); scene.dataset.state = s; }
+  /* ---------- state ---------- */
+  function state() { return scene.dataset.state; }
+  function set(s) {
+    if (s === "done") fit();
+    scene.dataset.state = s;
+    var gone = s !== "opening";
+    opener.setAttribute("aria-hidden", gone ? "true" : "false");
+    if (gone) opener.setAttribute("inert", ""); else opener.removeAttribute("inert");
+    if (s === "done") {
+      var resumable = !v.ended && v.currentTime > 0.5 && (!v.duration || v.currentTime < v.duration - 0.5);
+      tapLbl.textContent = resumable ? "Resume" : "Watch again";
+      tap.setAttribute("aria-label", resumable ? "Resume the video" : "Watch the invitation again");
+      replay.textContent = resumable ? "Resume the video" : "Watch the video";
+    }
+  }
 
+  /* ---------- fullscreen helpers ----------
+     The SCENE goes fullscreen, not the <video>. Fullscreening the video hands
+     control to the browser's native player: it covers the tap animation, the
+     buffering ring and the Skip button, and its own pause/close controls were
+     one of the ways the page got stranded. iPhone Safari can't fullscreen an
+     element — there the video simply plays inline, edge to edge. */
   function fullscreen() {
     try {
-      if (v.requestFullscreen) { var r = v.requestFullscreen(); if (r && r.catch) r.catch(function(){}); }
-      else if (v.webkitEnterFullscreen) { v.webkitEnterFullscreen(); }
-      else if (v.webkitRequestFullscreen) { v.webkitRequestFullscreen(); }
+      if (scene.requestFullscreen) { var r = scene.requestFullscreen({ navigationUI: "hide" }); if (r && r.catch) r.catch(function () {}); }
+      else if (scene.webkitRequestFullscreen) { scene.webkitRequestFullscreen(); }
     } catch (e) {}
   }
+  function fsElement() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
   function exitFullscreen() {
     try {
-      if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen();
+      if (document.exitFullscreen && document.fullscreenElement) document.exitFullscreen().catch(function () {});
       else if (document.webkitExitFullscreen && document.webkitFullscreenElement) document.webkitExitFullscreen();
+      else if (v.webkitDisplayingFullscreen && v.webkitExitFullscreen) v.webkitExitFullscreen(); // iOS native player
     } catch (e) {}
   }
 
-  /* a trusted click unlocks unmuted audio AND fullscreen together */
+  /* ---------- play / resume ---------- */
+  var lastLaunch = 0;
   function launch() {
+    var now = Date.now();
+    if (now - lastLaunch < 500) return;          // double taps
+    lastLaunch = now;
+    if (state() === "playing" && !v.paused) return;
+    if (v.networkState === 3) { noVideo(); return; }
+
+    var restart = v.ended || !v.duration || v.currentTime >= v.duration - 0.5;
     set("playing");
     v.muted = false;
-    v.currentTime = 0;
+    if (restart) { try { v.currentTime = 0; } catch (e) {} }
+    if (v.readyState < 3) scene.classList.add("is-waiting");
     var p = v.play();
-    if (p && p.catch) p.catch(function () { set("done"); });
+    if (p && p.catch) p.catch(function (err) {
+      if (err && err.name === "AbortError") return;   // superseded by a pause/skip
+      exitFullscreen(); set("done");
+    });
     fullscreen();
   }
 
-  seal.addEventListener("click", function (e) { e.stopPropagation(); launch(); });
-  opener.addEventListener("click", launch);
-  tap.addEventListener("click", function (e) { e.stopPropagation(); launch(); });
-  tap.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); launch(); }
-  });
-
-  /* The :fullscreen pseudo-class isn't reliable across every engine/version,
-     so mirror the state onto a class as well. */
-  function syncFs() {
-    var el = document.fullscreenElement || document.webkitFullscreenElement || null;
-    if (el === v) { v.classList.add("fs"); } else { v.classList.remove("fs"); }
+  /* Any stop that is NOT the natural end — pause in the native controls, iOS
+     "Done", app switch, phone call, Bluetooth headset — used to leave the page
+     in "playing": text hidden, opener gone, every tap target disabled. That's
+     the freeze. Now any pause drops to the invitation with a Resume card. */
+  function toInvite() {
+    if (state() !== "playing") return;
+    scene.classList.remove("is-waiting");
+    exitFullscreen();
+    v.classList.remove("fs");
+    set("done");
   }
-  document.addEventListener("fullscreenchange", syncFs);
-  document.addEventListener("webkitfullscreenchange", syncFs);
-  // iOS Safari's native video fullscreen fires its own pair
-  v.addEventListener("webkitbeginfullscreen", function () { v.classList.add("fs"); });
-  v.addEventListener("webkitendfullscreen", function () { v.classList.remove("fs"); });
-
+  v.addEventListener("pause", function () {
+    // "pause" fires just before "ended"; let "ended" handle the natural finish
+    setTimeout(function () { if (!v.ended) toInvite(); }, 80);
+  });
   v.addEventListener("ended", function () {
     exitFullscreen();
     v.classList.remove("fs");
-    setTimeout(function () { set("done"); }, 280);
+    scene.classList.remove("is-waiting");
+    setTimeout(function () { if (state() === "playing") set("done"); }, 280);
   });
 
-  /* no video? straight to the invitation */
-  function noVideo() { set("done"); }
+  v.addEventListener("waiting", function () { scene.classList.add("is-waiting"); });
+  v.addEventListener("stalled", function () { if (!v.paused && v.readyState < 3) scene.classList.add("is-waiting"); });
+  ["playing", "canplay", "canplaythrough", "seeked"].forEach(function (ev) {
+    v.addEventListener(ev, function () { if (v.readyState >= 3) scene.classList.remove("is-waiting"); });
+  });
+
+  function doSkip() { try { v.pause(); } catch (e) {} toInvite(); }
+
+  seal.addEventListener("click", function (e) { e.stopPropagation(); open(); });
+  opener.addEventListener("click", open);
+  tap.addEventListener("click", function (e) { e.stopPropagation(); launch(); });
+  replay.addEventListener("click", launch);
+  skip.addEventListener("click", function (e) { e.stopPropagation(); doSkip(); });
+  document.addEventListener("keydown", function (e) {
+    if (state() === "playing" && e.key === "Escape" && !fsElement()) doSkip();
+  });
+
+  /* fullscreen state mirrored to a class (pseudo-class support varies) */
+  function syncFs() {
+    var el = fsElement();
+    v.classList.toggle("fs", el === v);
+    scene.classList.toggle("is-fs", el === scene);
+    if (state() === "done") queueFit();
+  }
+  document.addEventListener("fullscreenchange", syncFs);
+  document.addEventListener("webkitfullscreenchange", syncFs);
+  v.addEventListener("webkitbeginfullscreen", function () { v.classList.add("fs"); });
+  v.addEventListener("webkitendfullscreen", function () {
+    v.classList.remove("fs");
+    // iOS usually pauses on "Done"; if it didn't, keep playing inline
+    setTimeout(function () { if (v.paused && !v.ended) toInvite(); }, 120);
+  });
+
+  /* no video → straight to the invitation, without an empty card */
+  function noVideo() {
+    scene.classList.add("no-video");
+    scene.classList.remove("is-waiting");
+    replay.hidden = true;
+    stopFx();
+    set("done");
+  }
   v.addEventListener("error", noVideo);
   var src = v.querySelector("source");
   if (src) src.addEventListener("error", noVideo);
+  // a <source> 404 can fire before this script attaches its listener
+  function checkSource() { if (v.networkState === 3 && state() !== "done") noVideo(); }
+  checkSource();
+  window.addEventListener("load", checkSource);
+
+  /* =====================================================================
+     OPENER — interlocking rings drawn in, stone set, sparkle, gold dust.
+     SVG + Web Animations API: vector-sharp like Lottie, zero dependencies.
+     ===================================================================== */
+  var svg = document.getElementById("rings");
+  var q = function (sel) { return Array.prototype.slice.call(svg.querySelectorAll(sel)); };
+  var idle = [];
+
+  function intro() {
+    if (!canAnimate) { opener.classList.add("ready"); return; }
+    var E = "cubic-bezier(0.65, 0, 0.35, 1)";
+    function len(el) { return 2 * Math.PI * parseFloat(el.getAttribute("r")) + 1; }
+    function draw(sel, dir, delay) {
+      q(sel).forEach(function (el) {
+        var L = len(el);
+        el.style.strokeDasharray = L + " " + L;
+        el.animate([{ strokeDashoffset: dir * L }, { strokeDashoffset: 0 }], { duration: 1500, delay: delay, easing: E, fill: "both" });
+      });
+    }
+    draw(".drawA", 1, 150);
+    draw(".drawB", -1, 380);
+    // a point of light running round each band
+    q(".glint").forEach(function (el, i) {
+      var L = len(el) - 1;
+      el.style.strokeDasharray = (L * 0.05) + " " + (L * 0.95);
+      el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 1800 + i * 400, fill: "both" });
+      idle.push(el.animate(
+        [{ strokeDashoffset: 0 }, { strokeDashoffset: i ? L : -L }],
+        { duration: 3400 + i * 700, delay: 1800 + i * 400, iterations: Infinity, easing: "linear" }
+      ));
+    });
+    // stone drops into its setting
+    document.getElementById("stone").animate(
+      [{ transform: "translateY(-10px) scale(0.2)", opacity: 0 },
+       { transform: "translateY(0) scale(1.12)", opacity: 1, offset: 0.7 },
+       { transform: "translateY(0) scale(1)", opacity: 1 }],
+      { duration: 700, delay: 1650, easing: "cubic-bezier(0.34, 1.4, 0.64, 1)", fill: "both" }
+    );
+    var halo = svg.querySelector(".halo");
+    halo.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 1950, fill: "forwards" });
+    idle.push(halo.animate([{ opacity: 1 }, { opacity: 0.45 }, { opacity: 1 }],
+      { duration: 2600, delay: 2450, iterations: Infinity, easing: "ease-in-out" }));
+    // twinkles
+    q(".spark").forEach(function (el, i) {
+      idle.push(el.animate(
+        [{ opacity: 0, transform: "scale(0) rotate(0deg)" },
+         { opacity: 1, transform: "scale(1) rotate(45deg)", offset: 0.12 },
+         { opacity: 0, transform: "scale(0) rotate(90deg)", offset: 0.26 },
+         { opacity: 0, transform: "scale(0) rotate(90deg)" }],
+        { duration: 3600 + i * 900, delay: 2050 + i * 700, iterations: Infinity, easing: "ease-out" }
+      ));
+    });
+    document.getElementById("caption").animate(
+      [{ opacity: 0, transform: "translateY(10px)", filter: "blur(4px)" }, { opacity: 1, transform: "none", filter: "none" }],
+      { duration: 900, delay: 1900, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" }
+    );
+    setTimeout(function () { opener.classList.add("ready"); }, 2300);
+  }
+
+  /* subtle 3D tilt toward the pointer (desktop only — no permission prompts) */
+  var tilt = document.getElementById("tilt");
+  if (canAnimate && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    opener.addEventListener("pointermove", function (e) {
+      var r = opener.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      tilt.style.transform = "rotateY(" + (x * 14).toFixed(2) + "deg) rotateX(" + (-y * 14).toFixed(2) + "deg)";
+    });
+    opener.addEventListener("pointerleave", function () { tilt.style.transform = ""; });
+  }
+
+  /* ---------- gold dust + tap burst on one canvas ---------- */
+  var cvs = document.getElementById("fx");
+  var ctx = cvs.getContext && cvs.getContext("2d");
+  var W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var dust = [], burst = [], raf = 0, lastT = 0, fxOn = !!ctx;
+  var sprite = null;
+
+  function makeSprite() {
+    var s = document.createElement("canvas"), n = 32;
+    s.width = s.height = n;
+    var g = s.getContext("2d"), gr = g.createRadialGradient(n / 2, n / 2, 0, n / 2, n / 2, n / 2);
+    gr.addColorStop(0, "rgba(255,246,224,1)");
+    gr.addColorStop(0.22, "rgba(255,230,168,0.9)");
+    gr.addColorStop(0.5, "rgba(212,169,74,0.28)");
+    gr.addColorStop(1, "rgba(212,169,74,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, n, n);
+    return s;
+  }
+  function sizeFx() {
+    if (!ctx) return;
+    W = opener.clientWidth; H = opener.clientHeight;
+    cvs.width = Math.round(W * dpr); cvs.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function mote(fresh) {
+    return {
+      x: Math.random() * W,
+      y: fresh ? Math.random() * H : H * (0.55 + Math.random() * 0.5),
+      r: 3 + Math.random() * 7,
+      vy: 8 + Math.random() * 22,           // px / second
+      sway: 6 + Math.random() * 14, ph: Math.random() * 6.28, sp: 0.4 + Math.random() * 0.8,
+      tw: Math.random() * 6.28, life: 0, max: 7 + Math.random() * 7
+    };
+  }
+  function seed() {
+    var n = Math.round(Math.min(46, Math.max(22, W * H / 9000)));
+    dust = []; for (var i = 0; i < n; i++) dust.push(mote(true));
+  }
+  function frame(t) {
+    raf = 0;
+    var dt = Math.min(0.05, (t - (lastT || t)) / 1000); lastT = t;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "lighter";
+    for (var i = 0; i < dust.length; i++) {
+      var d = dust[i];
+      d.life += dt; d.y -= d.vy * dt; d.ph += d.sp * dt; d.tw += 2.2 * dt;
+      if (d.life > d.max || d.y < -20) { dust[i] = mote(false); continue; }
+      var fade = Math.min(1, d.life / 1.5, (d.max - d.life) / 1.5);
+      var a = fade * (0.45 + 0.4 * Math.sin(d.tw));
+      if (a <= 0) continue;
+      ctx.globalAlpha = a;
+      var x = d.x + Math.sin(d.ph) * d.sway;
+      ctx.drawImage(sprite, x - d.r, d.y - d.r, d.r * 2, d.r * 2);
+    }
+    for (var j = burst.length - 1; j >= 0; j--) {
+      var b = burst[j];
+      b.life -= dt;
+      if (b.life <= 0) { burst.splice(j, 1); continue; }
+      var k = Math.pow(0.9, dt * 60);
+      b.vx *= k; b.vy = b.vy * k - 18 * dt;
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      ctx.globalAlpha = Math.min(1, b.life / b.max * 1.4);
+      ctx.drawImage(sprite, b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+    }
+    ctx.globalAlpha = 1;
+    if (fxOn || burst.length) raf = requestAnimationFrame(frame);
+  }
+  function startFx() {
+    if (!ctx || raf || document.hidden) return;
+    lastT = 0; raf = requestAnimationFrame(frame);
+  }
+  function stopFx() { fxOn = false; }
+
+  if (ctx) {
+    sprite = makeSprite();
+    sizeFx(); seed();
+    if (reduce) {                        // one still frame, no motion
+      fxOn = false;
+      ctx.globalCompositeOperation = "lighter";
+      dust.forEach(function (d) { ctx.globalAlpha = 0.5; ctx.drawImage(sprite, d.x - d.r, d.y - d.r, d.r * 2, d.r * 2); });
+    } else {
+      startFx();
+    }
+    window.addEventListener("resize", function () { if (state() === "opening") { sizeFx(); if (reduce) return; seed(); } });
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) { if (raf) cancelAnimationFrame(raf); raf = 0; }
+      else if (fxOn || burst.length) startFx();
+    });
+  }
+
+  /* ---------- tap: bloom + burst, then the video ---------- */
+  function open() {
+    if (state() !== "opening") return;
+    launch();                          // play() must run inside the tap for sound
+    if (!canAnimate) { stopFx(); return; }
+
+    var r = seal.getBoundingClientRect(), o = opener.getBoundingClientRect();
+    var cx = r.left - o.left + r.width / 2, cy = r.top - o.top + r.height * 0.5;
+    if (ctx) {
+      for (var i = 0; i < 70; i++) {
+        var ang = Math.random() * Math.PI * 2, sp = 120 + Math.random() * 420, life = 0.7 + Math.random() * 0.7;
+        burst.push({ x: cx, y: cy, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, r: 3 + Math.random() * 6, life: life, max: life });
+      }
+      startFx();
+    }
+    stopFx();                          // dust stops spawning; burst finishes, then the loop ends
+    svg.animate(
+      [{ transform: "scale(1)", filter: "brightness(1)", opacity: 1 },
+       { transform: "scale(1.06)", filter: "brightness(1.8)", opacity: 1, offset: 0.25 },
+       { transform: "scale(1.35)", filter: "brightness(2.2)", opacity: 0 }],
+      { duration: 800, easing: "cubic-bezier(0.3, 0, 0.2, 1)", fill: "forwards" }
+    );
+    document.getElementById("flash").animate(
+      [{ opacity: 0, transform: "scale(0.3)" }, { opacity: 0.95, transform: "scale(2.4)", offset: 0.35 }, { opacity: 0, transform: "scale(7)" }],
+      { duration: 1100, easing: "cubic-bezier(0.2, 0.6, 0.2, 1)", fill: "forwards" }
+    );
+    idle.forEach(function (a) { try { a.cancel(); } catch (e) {} });
+  }
+
+  intro();
 })();
 </script>
 

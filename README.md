@@ -1,106 +1,63 @@
-# Rahi & Sahil — Ring Ceremony invite
+# Rahi & Sahil — Engagement invite
 
-Single-page invitation site. Static HTML, no build step, no dependencies,
-no image files.
-
-## Files
+Single-page invitation. Static HTML, no build step, no dependencies.
 
 ```
-index.html     the page
-invite.mp4     YOUR VIDEO — the only thing you add
+index.html    the page
+invite.mp4    the video (H.264, 1080×1920, faststart)
+preview.jpg   1200×630 link-preview image (WhatsApp / iMessage / Instagram DMs)
 ```
 
-That's it. No poster image needed.
+## Flow
 
-## The video
+1. **Opener**: two gold rings draw themselves in and interlock, the stone drops into its setting, then sparkles, a light that runs around each band, and gold dust. It's all SVG + the Web Animations API, so it's vector-sharp like Lottie with no library and no JSON file.
+2. **Tap**: the rings flare, gold particles burst out, an ivory bloom fades into the first frame of the video. The video plays **with sound**. The whole page goes fullscreen, not the `<video>` element (see below).
+3. **Invitation**: when the video ends, or stops for **any** reason, the text animates in and the video shrinks to a card. The card says **Resume** when the video stopped partway and **Watch again** when it finished.
 
-Export 1080 × 1920, H.264, 30fps. Keep it under ~15 MB so it loads fast on
-mobile data. Name it `invite.mp4` and put it next to `index.html`.
+## Why it used to freeze
 
-Because it loops, try to make the last frame resemble the first — the loop
-point then reads as intentional rather than as a jump.
+The page only moved to the invitation on the video's `ended` event. Anything else that stopped the video left it stuck in the "playing" state. In that state the text is hidden, the opener is gone and every tap target is switched off. The things that stop a video early:
 
-## Deploy
+- tapping pause or "Done" in the browser's native fullscreen player
+- switching apps, locking the screen, a phone call, a Bluetooth headset disconnecting
+- the network stalling
 
-```bash
-git init
-git add .
-git commit -m "Ring ceremony invitation"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/REPO-NAME.git
-git push -u origin main
-```
+Fixes:
 
-Then on GitHub: **Settings → Pages → Source: Deploy from a branch →
-main / (root) → Save**. Live in a minute or two at
-`https://YOUR-USERNAME.github.io/REPO-NAME/`.
+- any `pause` that isn't the natural end takes you to the invitation, with Resume
+- the **scene** goes fullscreen instead of the video, so no native player takes over. On iPhone, where elements can't go fullscreen, the video plays inline edge to edge.
+- a **Skip to invitation** pill appears while the video plays
+- a buffering ring shows if loading takes more than 0.4 s
+- text exits instantly. Before, it faded out on the same staggered delays it used to come in, so it hung over the growing video on replay.
 
-The repo must be **public** for Pages to work on a free account.
+## Other edge cases handled
 
-## How the autoplay works
-
-Every browser blocks autoplay with sound — there is no way around it, and
-any tutorial claiming otherwise is wrong. So the page does what Instagram
-and TikTok do: autoplay **muted** and loop, full-bleed, no play button.
-
-## How people unmute
-
-Four things work together, because a small icon on its own gets ignored:
-
-1. **The whole video is the tap target.** Tapping anywhere unmutes — not
-   just the pill. The buttons at the bottom still work normally.
-2. **The first tap turns sound ON rather than toggling.** That is what
-   someone tapping actually wants; toggling makes the first tap a coin flip.
-3. **The label says "Tap for sound",** not "Sound". It names the action.
-4. **A gold halo pulses out of the pill while muted,** and the equaliser
-   bars move slowly. Motion in the corner draws the eye; the bars read as
-   "there is audio here" faster than a speaker glyph does.
-
-After about five seconds the pill shrinks to just the bars, so it stops
-competing with the invitation. Turning sound on speeds up the bars, shows
-"Sound on" for a moment, then tucks away again.
-
-If autoplay is refused entirely (low-power mode, data saver), the label
-changes to "Tap to play" and any tap starts it.
-
-### Assume most people never unmute
-
-Plenty of people open a forwarded link in public, or on a silenced phone,
-and will watch the whole thing muted. Treat music as a bonus, never as
-something the invitation depends on. Every word a guest must read —
-names, date, time, venue — has to be legible on screen with the sound off.
-The page handles its half of that; make sure the video does too.
-
-## The loading state
-
-There's no poster image. Instead the page shows a CSS-rendered card — the
-names over a dark ground with gold light sweeping across it — which
-cross-fades out the instant the first video frame decodes.
-
-This is better than a poster file: nothing extra to export, nothing to
-version, and it looks composed rather than like a placeholder. It also
-means the page is never blank, even on a slow connection.
-
-A 6-second timer forces the fade regardless, so a failed video load can
-never leave someone stuck on the loading card.
+- **Landscape phones / tiny screens**: when there's no room for the card, the text stacks, scrolls and gets a "Watch the video" button.
+- **Web fonts load late**: the layout is measured again after `document.fonts.ready`.
+- **Missing or broken video**: goes straight to the invitation with no empty card. This also covers a `<source>` 404 that happens before the script runs.
+- **Double taps** are ignored, and `play()` being blocked falls back to the invitation.
+- **Video cropping**: the video uses `object-fit: contain`, because `cover` cut off about 9% on each side of tall phones, which clipped the couple.
+- **Slow first play**: `invite.mp4` was remuxed with `+faststart` (lossless). The index used to sit at the end of the file, so browsers had to fetch the tail before they could start playing.
+- **Particle loop**: stops once the opener is gone and pauses in background tabs.
+- **Reduced motion** gets static rings and instant transitions.
 
 ## Before you send it
 
-- [ ] Real start time — it's in **two** places: the `.time` paragraph and
-      the `dates=` parameter in the calendar link
-- [ ] Venue spelling confirmed (the road name especially)
-- [ ] Opened on a real phone, not just a desktop browser
-- [ ] Checked the loop point doesn't jar
+- [ ] Hosts line: "Sudhir & Rajul Patel". Confirm the surname.
+- [ ] Times. The video says "6:00 pm onwards". The page says Ceremony 6:00 / Dinner 7:30, and the calendar `dates=` runs 18:00–22:00.
+- [ ] Test on a real iPhone **and** Android, opened from WhatsApp.
 
-## Optional: link previews
+## Smaller video (optional)
 
-WhatsApp and Instagram DMs show a preview card for links. Without an
-image they fall back to title and description text, which is fine. If you
-want a picture there, export one frame as `preview.jpg`, put it in the
-repo, and add this to the `<head>`:
+It's about 15.6 MB at 8 Mbps. This roughly halves it with no visible loss on a phone:
 
-```html
-<meta property="og:image" content="https://YOUR-USERNAME.github.io/REPO-NAME/preview.jpg">
+```bash
+ffmpeg -i invite.mp4 -c:v libx264 -crf 23 -preset slow -profile:v high -pix_fmt yuv420p \
+       -c:a aac -b:a 128k -movflags +faststart invite-small.mp4
 ```
 
-It has to be the full absolute URL — a relative path won't work.
+## Deploy
+
+GitHub Pages → Settings → Pages → Deploy from branch `main` / root.
+Live at `https://krishpatel3778.github.io/rahi-sahil-invite/`.
+WhatsApp caches previews, so if you've already shared the link, test with `?v=2` added.
