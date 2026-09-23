@@ -337,7 +337,7 @@
 
   <div class="player">
     <video id="v" muted playsinline preload="auto" disablepictureinpicture>
-      <source src="invite.mp4" type="video/mp4">
+      <source src="invite.mp4" type="video/mp4" onerror="window.__vidErr=1">
     </video>
     <span class="buffer" aria-hidden="true"></span>
     <button class="tap" id="tap" type="button" aria-label="Watch the invitation again">
@@ -561,7 +561,6 @@
     if (now - lastLaunch < 500) return;          // double taps
     lastLaunch = now;
     if (state() === "playing" && !v.paused) return;
-    if (v.networkState === 3) { noVideo(); return; }
 
     var restart = v.ended || !v.duration || v.currentTime >= v.duration - 0.5;
     set("playing");
@@ -642,10 +641,16 @@
   v.addEventListener("error", noVideo);
   var src = v.querySelector("source");
   if (src) src.addEventListener("error", noVideo);
-  // a <source> 404 can fire before this script attaches its listener
-  function checkSource() { if (v.networkState === 3 && state() !== "done") noVideo(); }
-  checkSource();
-  window.addEventListener("load", checkSource);
+  /* A <source> 404 can fire before this script runs, so the inline onerror on
+     <source> records it at parse time. Do NOT test networkState === 3 here:
+     browsers set NETWORK_NO_SOURCE at the START of loading too, and on a
+     reload (cached, faster) the script lands in that window — that was the
+     "skips straight to the invitation with a blank card" bug. */
+  if (window.__vidErr || (v.error && v.error.code)) noVideo();
+
+  /* Back/forward cache restores the page exactly as it was left (invitation
+     showing, video paused). Start fresh instead. */
+  window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
 
   /* =====================================================================
      OPENER — interlocking rings drawn in, stone set, sparkle, gold dust.
